@@ -1,0 +1,67 @@
+<!-- o campo fechado: parece o input do formulário, para a tela não ficar mista -->
+<button
+  type="button"
+  class="campo"
+  [class.campo-vazio]="!rotuloAtual"
+  [class.campo-pilula]="aparencia === 'pilula'"
+  [disabled]="desabilitado()"
+  [attr.aria-haspopup]="'listbox'"
+  [attr.aria-expanded]="aberto()"
+  (click)="abrir()"
+>
+  <span class="campo-texto">{{ rotuloAtual || placeholder }}</span>
+  <mat-icon class="campo-seta">expand_more</mat-icon>
+</button>
+
+@if (aberto()) {
+  <div class="fundo" (click)="fecharPeloFundo($event)">
+    <!-- stopPropagation: tocar dentro da folha não pode fechá-la -->
+    <div
+      class="folha"
+      role="listbox"
+      [attr.aria-label]="titulo || placeholder"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="folha-topo">
+        <h3>{{ titulo || placeholder }}</h3>
+        <button type="button" class="fechar" aria-label="Fechar lista" (click)="fechar()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </header>
+
+      @if (temBusca) {
+        <div class="busca">
+          <mat-icon>search</mat-icon>
+          <input
+            type="text"
+            placeholder="Buscar"
+            [ngModel]="busca()"
+            (ngModelChange)="busca.set($event)"
+          />
+        </div>
+      }
+
+      <div class="opcoes">
+        @for (opcao of visiveis; track opcao.valor) {
+          <button
+            type="button"
+            class="opcao"
+            role="option"
+            [class.opcao-marcada]="selecionada(opcao)"
+            [attr.aria-selected]="selecionada(opcao)"
+            (click)="escolher(opcao)"
+          >
+            <span class="opcao-texto">{{ opcao.rotulo }}</span>
+            @if (selecionada(opcao)) {
+              <mat-icon class="opcao-check">check</mat-icon>
+            }
+          </button>
+        }
+
+        @if (visiveis.length === 0) {
+          <p class="vazio">Nada encontrado.</p>
+        }
+      </div>
+    </div>
+  </div>
+}

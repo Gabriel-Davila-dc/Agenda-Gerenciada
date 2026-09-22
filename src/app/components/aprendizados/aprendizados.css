@@ -1,0 +1,108 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4em;
+  max-width: 48em;
+}
+
+.aviso-filtro {
+  margin: 0;
+  padding: 0.7em 1em;
+  border-radius: 0.8em;
+  background: var(--primaria-suave);
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+}
+
+.aprendizado-dia {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+}
+
+.aprendizado-data {
+  margin: 0;
+  padding-bottom: 0.3em;
+  border-bottom: 2px solid var(--diario-suave);
+  font-family: var(--fonte-titulo);
+  font-size: 1.05rem;
+  color: var(--texto);
+}
+
+.aprendizado-data::first-letter {
+  text-transform: uppercase;
+}
+
+/* a borda da esquerda diz de onde veio: roxo é diário, amarelo é tarefa */
+.aprendizado {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  width: 100%;
+  padding: 0.9em 1em;
+  border: 1px solid var(--borda-cinza);
+  border-left: 4px solid var(--destaque);
+  border-radius: 0.8em;
+  background: var(--bg-branco);
+  font-family: inherit;
+  text-align: left;
+  color: var(--texto);
+  cursor: pointer;
+}
+
+.aprendizado:hover {
+  box-shadow: var(--sombra);
+}
+
+.aprendizado-diario {
+  border-left-color: var(--diario);
+}
+
+.aprendizado-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3em 0.5em;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.aprendizado-topo mat-icon {
+  font-size: 1.15rem;
+  width: 1.15rem;
+  height: 1.15rem;
+  color: var(--destaque-escuro);
+}
+
+.aprendizado-diario .aprendizado-topo mat-icon {
+  color: var(--diario);
+}
+
+.aprendizado-detalhe {
+  font-weight: 500;
+}
+
+.aprendizado-texto {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.vazio-grande {
+  padding: 2.5em 1em;
+  text-align: center;
+  color: var(--texto-suave);
+}
+
+.vazio-grande p {
+  margin: 0.4em auto;
+  max-width: 28em;
+}
+
+.vazio-grande mat-icon {
+  font-size: 2.6rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  color: var(--diario);
+}

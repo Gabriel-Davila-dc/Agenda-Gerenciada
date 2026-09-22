@@ -1,0 +1,769 @@
+:host {
+  display: block;
+}
+
+/* painel, topo, btn-novo e o formulário em overlay vêm do styles.css */
+
+.topo-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6em;
+}
+
+.btn-diario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  padding: 0.7em 1.2em;
+  border: 2px solid var(--diario);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--diario);
+  font-family: var(--fonte-titulo);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-diario:hover {
+  background: var(--diario-suave);
+}
+
+/* ---------- alternador e filtro ---------- */
+
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8em 1.2em;
+  margin-bottom: 1.2em;
+}
+
+.alternador {
+  display: flex;
+  gap: 0.3em;
+  padding: 0.3em;
+  border-radius: 100px;
+  background: var(--bg-botao-neutro);
+}
+
+.alternador button {
+  border: none;
+  background: transparent;
+  padding: 0.55em 1.2em;
+  border-radius: 100px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--texto-suave);
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.alternador button.ativo {
+  background: var(--primaria);
+  color: var(--sobre-cor);
+  box-shadow: 0 2px 6px rgba(31, 39, 51, 0.3);
+}
+
+.filtro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6em 1em;
+}
+
+.filtro-seletor {
+  min-width: 14em;
+}
+
+.progresso {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.progresso-barra {
+  display: block;
+  width: 7em;
+  height: 0.55em;
+  border-radius: 100px;
+  background: var(--bg-botao-neutro);
+  overflow: hidden;
+}
+
+.progresso-cheio {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--etapa-feito);
+  transition: width 0.3s ease;
+}
+
+/* ---------- quadro ---------- */
+
+/* [hidden] sozinho não esconde isto: o atributo vale como display:none na
+   folha do navegador, e a regra de display abaixo, sendo do autor, ganha */
+.quadro[hidden] {
+  display: none;
+}
+
+.quadro {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(230px, 1fr));
+  gap: 1em;
+  overflow-x: auto;
+  padding-bottom: 0.5em;
+}
+
+.coluna {
+  background: var(--bg-claro);
+  border-radius: 1.2em;
+  padding: 1em 0.8em 1.2em;
+  border-top: 5px solid var(--borda-cinza);
+}
+
+/* cada etapa tem sua cor, a mesma da etiqueta no calendário */
+.coluna-a-fazer {
+  border-top-color: var(--etapa-a-fazer);
+}
+.coluna-fazendo {
+  border-top-color: var(--etapa-fazendo);
+}
+.coluna-travado {
+  border-top-color: var(--etapa-travado);
+}
+.coluna-feito {
+  border-top-color: var(--etapa-feito);
+}
+
+.coluna-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.9em;
+  padding: 0 0.3em;
+}
+
+.coluna-topo h2 {
+  font-family: var(--fonte-titulo);
+  font-size: 1.05rem;
+  margin: 0;
+  color: var(--texto);
+}
+
+.contador {
+  min-width: 1.8em;
+  text-align: center;
+  padding: 0.1em 0.5em;
+  border-radius: 100px;
+  background: var(--bg-branco);
+  border: 1px solid var(--borda-cinza);
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+  min-height: 6em;
+}
+
+.card {
+  background: var(--bg-branco);
+  border-radius: 0.9em;
+  padding: 0.9em 1em;
+  border: 1px solid var(--borda-cinza);
+  box-shadow: 0 4px 12px rgba(31, 39, 51, 0.1);
+  cursor: grab;
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+.card h3 {
+  font-family: var(--fonte-titulo);
+  font-size: 1rem;
+  margin: 0 0 0.5em;
+  color: var(--texto);
+}
+
+.card p {
+  margin: 0 0 0.35em;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+}
+
+.card mat-icon {
+  flex: none;
+  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
+  color: var(--primaria-clara);
+}
+
+.card-objetivo {
+  font-weight: 600;
+}
+
+.card .card-objetivo {
+  color: var(--primaria);
+}
+
+.card .card-descricao {
+  display: block;
+  margin: 0.6em 0 0;
+  padding-top: 0.6em;
+  border-top: 1px solid var(--borda-cinza);
+  line-height: 1.5;
+}
+
+.card .card-aprendizado {
+  align-items: flex-start;
+  margin: 0.6em 0 0;
+  padding: 0.5em 0.6em;
+  border-radius: 0.6em;
+  background: var(--diario-suave);
+  color: var(--diario);
+  line-height: 1.45;
+}
+
+.card .card-aprendizado mat-icon {
+  color: var(--diario);
+}
+
+.vazio {
+  margin: 0;
+  padding: 1em 0.5em;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+  opacity: 0.7;
+}
+
+.cdk-drag-preview {
+  border-radius: 0.9em;
+  box-shadow: 0 12px 28px rgba(31, 39, 51, 0.3);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.35;
+}
+
+.cdk-drop-list-dragging .card:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* ---------- calendário ---------- */
+
+.calendario {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.carregar-antes {
+  align-self: center;
+  border: none;
+  background: transparent;
+  padding: 0.7em 1.2em;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primaria);
+  cursor: pointer;
+  border-radius: 100px;
+  min-height: 44px;
+}
+
+.carregar-antes:hover {
+  background: var(--primaria-suave);
+}
+
+.mes {
+  margin: 0.8em 0 0.2em;
+  font-family: var(--fonte-titulo);
+  font-size: 1.4rem;
+  color: var(--texto);
+}
+
+/* sete colunas iguais: minmax(0,1fr) e não 1fr, senão uma etiqueta comprida
+   alarga a coluna e desalinha a semana inteira */
+.semana {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.3em;
+  padding: 0.3em;
+  border: 2px solid transparent;
+  border-radius: 0.8em;
+}
+
+/* a semana de hoje ganha moldura: referência imediata ao abrir a tela */
+.semana-atual {
+  border-color: var(--destaque);
+}
+
+.dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15em;
+  min-height: 5em;
+  padding: 0.3em 0.15em;
+  border-radius: 0.6em;
+  background: var(--bg-claro);
+  min-width: 0;
+}
+
+.dia-semana {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--primaria);
+}
+
+.dia-numero {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--texto);
+  cursor: pointer;
+  width: 1.9em;
+  height: 1.9em;
+  border-radius: 50%;
+  padding: 0;
+}
+
+.dia-numero:hover {
+  background: var(--primaria-suave);
+}
+
+.dia-hoje .dia-numero {
+  background: var(--destaque);
+  color: var(--texto);
+}
+
+.dia-tarefas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  width: 100%;
+  min-width: 0;
+}
+
+/* a etiqueta corta com reticências: o nome inteiro fica no title e no toque */
+.etiqueta {
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 0.4em;
+  padding: 0.25em 0.4em;
+  font-family: inherit;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-align: left;
+  color: var(--sobre-cor);
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.etiqueta:hover {
+  filter: brightness(1.1);
+}
+
+/* mesmas cores das colunas do quadro, para as duas visões combinarem */
+.etapa-a-fazer {
+  background: var(--etapa-a-fazer);
+}
+.etapa-fazendo {
+  background: var(--etapa-fazendo);
+}
+.etapa-travado {
+  background: var(--etapa-travado);
+  color: var(--texto);
+}
+.etapa-feito {
+  background: var(--etapa-feito);
+}
+
+.etiqueta-nome {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* o diário do dia: tracejado e roxo, para não se confundir com tarefa */
+.etiqueta-diario {
+  display: flex;
+  align-items: center;
+  gap: 0.2em;
+  width: 100%;
+  min-width: 0;
+  border: 1px dashed var(--diario);
+  border-radius: 0.4em;
+  padding: 0.2em 0.35em;
+  background: var(--diario-suave);
+  color: var(--diario);
+  font-family: inherit;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.etiqueta-diario mat-icon {
+  flex: none;
+  font-size: 0.95rem;
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.etiqueta-diario span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dia-acoes {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* o objetivo só cabe na agenda do celular; na grade a coluna é estreita demais */
+.etiqueta-objetivo,
+.semana-titulo,
+.marcar-dia {
+  display: none;
+}
+
+/* na grade o "+ diário" fica discreto: aparece ao passar o mouse no dia, no
+   dia de hoje e para quem navega pelo teclado */
+.marcar-diario {
+  border: none;
+  border-radius: 0.3em;
+  background: transparent;
+  padding: 0.1em 0.3em;
+  font-family: inherit;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--diario);
+  cursor: pointer;
+  opacity: 0;
+}
+
+.dia:hover .marcar-diario,
+.dia-hoje .marcar-diario,
+.marcar-diario:focus-visible {
+  opacity: 1;
+}
+
+/* tablet na horizontal: largura de grade, mas sem mouse para o hover */
+@media (hover: none) {
+  .marcar-diario {
+    opacity: 1;
+  }
+}
+
+/* a aba Aprendizados tem componente e CSS próprios (components/aprendizados) */
+
+/* ---------- formulários: o que é só da agenda ---------- */
+
+.formulario .campo-aprendizado {
+  color: var(--diario);
+}
+
+.campo-aprendizado span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
+.campo-aprendizado mat-icon {
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.formulario .campo-aprendizado textarea {
+  border-color: var(--diario);
+  background: var(--diario-suave);
+}
+
+.sem-objetivo {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  min-height: 44px;
+  padding: 0.6em 0.7em;
+  border: 1px dashed var(--primaria-clara);
+  border-radius: 0.6em;
+  color: var(--primaria);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.formulario-diario h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  color: var(--diario);
+}
+
+.diario-dia {
+  margin: -0.5em 0 0;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.diario-dia::first-letter {
+  text-transform: uppercase;
+}
+
+/* ---------- telas médias: o quadro rola para o lado ---------- */
+
+@media (max-width: 900px) {
+  .quadro {
+    grid-template-columns: repeat(4, 78vw);
+  }
+}
+
+/* ==================================================================
+   CELULAR: a agenda empilhada
+
+   A grade de 7 colunas não sobrevive a 360px de tela — cada dia fica com
+   ~48px e a etiqueta vira risco colorido. Aqui a semana vira uma lista:
+   cada dia ocupa a largura toda, com o número à esquerda e as tarefas
+   legíveis à direita.
+   ================================================================== */
+
+@media (max-width: 700px) {
+  .topo-botoes {
+    width: 100%;
+  }
+
+  .topo-botoes button {
+    flex: 1;
+  }
+
+  .alternador {
+    width: 100%;
+  }
+
+  .alternador button {
+    flex: 1;
+    padding: 0.55em 0.4em;
+    font-size: 0.88rem;
+  }
+
+  .filtro,
+  .filtro-seletor {
+    width: 100%;
+  }
+
+  .mes {
+    font-size: 1.5rem;
+    margin: 1.1em 0 0.1em;
+  }
+
+  .calendario {
+    gap: 0.9em;
+  }
+
+  .semana-titulo {
+    display: block;
+    margin: 0.4em 0 0;
+    padding: 0 0.2em 0.35em;
+    font-family: var(--fonte-titulo);
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--primaria);
+    border-bottom: 2px solid var(--primaria-suave);
+  }
+
+  .semana-titulo-atual {
+    color: var(--texto);
+    border-bottom-color: var(--destaque);
+  }
+
+  .semana {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    background: var(--bg-branco);
+    border: 2px solid var(--borda-cinza);
+    border-radius: 1em;
+    /* segura o canto arredondado sobre o fundo do primeiro e do último dia */
+    overflow: hidden;
+  }
+
+  .semana-atual {
+    border-color: var(--destaque);
+  }
+
+  .dia {
+    display: grid;
+    grid-template-columns: 3.6em 1fr;
+    grid-template-areas:
+      'semana tarefas'
+      'numero tarefas';
+    align-items: center;
+    gap: 0 0.7em;
+    min-height: 4.4em;
+    padding: 0.7em 0.8em;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  /* a divisória entre os dias, que era o vão da grade */
+  .dia + .dia {
+    border-top: 2px solid var(--borda-cinza);
+  }
+
+  .dia-semana {
+    grid-area: semana;
+    justify-self: center;
+    font-size: 0.8rem;
+  }
+
+  .dia-numero {
+    grid-area: numero;
+    justify-self: center;
+    width: 2.2em;
+    height: 2.2em;
+    font-size: 1.35rem;
+  }
+
+  /* o dia de hoje se acha de longe: faixa pintada e etiqueta embaixo do dia */
+  .dia-hoje {
+    background: var(--destaque-claro);
+  }
+
+  .dia-hoje .dia-semana::after {
+    content: 'HOJE';
+    display: block;
+    margin-top: 0.15em;
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    color: var(--texto-suave);
+  }
+
+  .dia-tarefas {
+    grid-area: tarefas;
+    gap: 0.4em;
+    padding-left: 0.7em;
+    /* a linha que separa o número das tarefas dentro da faixa */
+    border-left: 2px solid var(--primaria-suave);
+  }
+
+  .dia-hoje .dia-tarefas {
+    border-left-color: var(--destaque);
+  }
+
+  /* agora sobra largura: o nome aparece inteiro e o objetivo entra embaixo */
+  .etiqueta {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.1em;
+    min-height: 44px;
+    padding: 0.5em 0.7em;
+    border-radius: 0.6em;
+    font-size: 0.95rem;
+    white-space: normal;
+    overflow: visible;
+  }
+
+  .etiqueta-nome {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.25;
+  }
+
+  .etiqueta-objetivo {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    opacity: 0.9;
+    line-height: 1.2;
+  }
+
+  .etiqueta-diario {
+    align-items: flex-start;
+    min-height: 44px;
+    padding: 0.5em 0.7em;
+    border-radius: 0.6em;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .etiqueta-diario mat-icon {
+    font-size: 1.15rem;
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  /* duas linhas do diário na faixa; o resto aparece ao abrir */
+  .etiqueta-diario span {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    line-height: 1.35;
+  }
+
+  .dia-acoes {
+    justify-content: flex-start;
+    gap: 0.4em;
+  }
+
+  .dia-acoes:empty {
+    display: none;
+  }
+
+  /* dia livre: a faixa inteira continua tocável, sem parecer uma tarefa */
+  .marcar-dia,
+  .marcar-diario {
+    display: block;
+    flex: 1;
+    min-height: 40px;
+    padding: 0.5em 0.7em;
+    border: 2px dashed var(--primaria-suave);
+    border-radius: 0.6em;
+    background: transparent;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: left;
+    color: var(--primaria);
+    opacity: 1;
+  }
+
+  .marcar-diario {
+    border-color: var(--diario-suave);
+    color: var(--diario);
+  }
+
+  .dia-hoje .marcar-dia {
+    border-color: var(--destaque);
+    color: var(--texto-suave);
+  }
+}

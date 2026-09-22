@@ -1,0 +1,45 @@
+<div
+  class="overlay"
+  [class.aberto]="aberto()"
+  [attr.inert]="aberto() ? null : ''"
+  (click)="fecharPeloFundo($event)"
+>
+  <aside class="painel-lateral" (click)="$event.stopPropagation()">
+    <header class="painel-topo">
+      <h2>Configurações</h2>
+      <button type="button" class="btn-fechar" aria-label="Fechar" (click)="fechar()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
+
+    <h3 class="rotulo-secao">Tema</h3>
+    <div class="segmentado" role="radiogroup" aria-label="Tema">
+      @for (opcao of opcoesTema; track opcao.titulo) {
+        <button
+          type="button"
+          role="radio"
+          [attr.aria-checked]="theme.temaEscolhido() === opcao.valor"
+          [class.ativo]="theme.temaEscolhido() === opcao.valor"
+          [title]="opcao.titulo"
+          (click)="theme.escolher(opcao.valor)"
+        >
+          <mat-icon>{{ opcao.icone }}</mat-icon>
+          <span>{{ opcao.titulo }}</span>
+        </button>
+      }
+    </div>
+
+    <h3 class="rotulo-secao">Conta</h3>
+    <nav class="lista">
+      <a routerLink="/cadastros" class="linha" (click)="fechar()">
+        <mat-icon>list_alt</mat-icon>
+        <span>Cadastros</span>
+        <mat-icon class="seta">chevron_right</mat-icon>
+      </a>
+      <button type="button" class="linha linha-sair" (click)="sair()">
+        <mat-icon>logout</mat-icon>
+        <span>Sair</span>
+      </button>
+    </nav>
+  </aside>
+</div>

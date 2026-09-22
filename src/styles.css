@@ -1,0 +1,439 @@
+/**
+ * Estilos globais: a paleta, o fundo e as peças que mais de uma tela usa
+ * (painel, topo, formulário em overlay). O que é de uma tela só fica no CSS
+ * dela. Nunca escreva cor literal em CSS de componente: use as variáveis.
+ */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  min-height: 100vh;
+  background: var(--fundo-pagina);
+}
+
+/**
+ * Tema claro (padrão) e escuro. Sem escolha gravada, segue o sistema; o
+ * ThemeService grava `data-theme="escuro"` no <html> quando a pessoa escolhe
+ * um tema fixo. --sobre-cor não muda de tema: é o texto (quase) branco que
+ * fica sobre fundos fortes (header, botão cheio, alerta) e esses continuam
+ * saturados nos dois temas.
+ */
+:root {
+  /* MARCA */
+  --primaria: #2f4b7c;
+  --primaria-clara: #4a6fa5;
+  --primaria-suave: #e2e9f4;
+  --destaque: #f2b134;
+  --destaque-claro: #fdf0cf;
+  --destaque-escuro: #9a6a0c;
+  --texto: #1f2733;
+  --texto-suave: #4b5563;
+  --fundo-creme: #f7f5ef;
+  --fundo-pagina: #e8edf5;
+  --fonte-titulo: 'Nunito', 'Roboto', sans-serif;
+
+  /* DIÁRIO E APRENDIZADO: uma cor só para tudo que é "o que aprendi" */
+  --diario: #6d4fb3;
+  --diario-suave: #eee8f8;
+
+  /* ETAPAS: da mais neutra à de concluído, iguais no calendário e no quadro */
+  --etapa-a-fazer: #6b7a90;
+  --etapa-fazendo: #4a6fa5;
+  --etapa-travado: #f2b134;
+  --etapa-feito: #2e7d4f;
+
+  /* BACKGROUNDS E NEUTROS */
+  --bg-claro: #f3f4f6;
+  --bg-branco: #fcfcfd;
+  --bg-botao-neutro: #eceef2;
+
+  /* BORDAS E SOMBRAS */
+  --borda-cinza: rgba(31, 39, 51, 0.2);
+  --sombra: 0 8px 24px rgba(31, 39, 51, 0.16);
+
+  /* ESTADO SEMÂNTICO */
+  --erro: #b42323;
+
+  /* TEXTO SOBRE COR FORTE: não muda de tema (ver comentário acima) */
+  --sobre-cor: #fcfcfd;
+
+  color-scheme: light;
+}
+
+/* Tema escuro: mesmas variáveis, sem @mixin porque este arquivo é CSS puro
+   (custom-theme.scss é o único .scss do projeto). Repetido nos dois seletores
+   de propósito — ver comentário no :root acima. */
+:root[data-theme='escuro'] {
+  --primaria: #5b84c4;
+  --primaria-clara: #7ba0dd;
+  --primaria-suave: #223154;
+  --destaque: #f2b134;
+  --destaque-claro: #4a3a17;
+  --destaque-escuro: #ffce6b;
+  --texto: #e9edf5;
+  --texto-suave: #aab4c8;
+  --fundo-creme: #262e42;
+  --fundo-pagina: #10141d;
+  --diario: #a48ee8;
+  --diario-suave: #2c2447;
+  --etapa-a-fazer: #8b98ac;
+  --etapa-fazendo: #6f97d6;
+  --etapa-travado: #f2b134;
+  --etapa-feito: #4caf7d;
+  --bg-claro: #202838;
+  --bg-branco: #1b2233;
+  --bg-botao-neutro: #2a3348;
+  --borda-cinza: rgba(233, 237, 245, 0.16);
+  --sombra: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --erro: #ff6b70;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --primaria: #5b84c4;
+    --primaria-clara: #7ba0dd;
+    --primaria-suave: #223154;
+    --destaque: #f2b134;
+    --destaque-claro: #4a3a17;
+    --destaque-escuro: #ffce6b;
+    --texto: #e9edf5;
+    --texto-suave: #aab4c8;
+    --fundo-creme: #262e42;
+    --fundo-pagina: #10141d;
+    --diario: #a48ee8;
+    --diario-suave: #2c2447;
+    --etapa-a-fazer: #8b98ac;
+    --etapa-fazendo: #6f97d6;
+    --etapa-travado: #f2b134;
+    --etapa-feito: #4caf7d;
+    --bg-claro: #202838;
+    --bg-branco: #1b2233;
+    --bg-botao-neutro: #2a3348;
+    --borda-cinza: rgba(233, 237, 245, 0.16);
+    --sombra: 0 8px 24px rgba(0, 0, 0, 0.45);
+    --erro: #ff6b70;
+    color-scheme: dark;
+  }
+}
+
+/* botões do Material no login: o tema pinta o rótulo por cima do CSS da tela */
+button.mat-mdc-raised-button.btn-entrar {
+  color: var(--sobre-cor) !important;
+}
+
+button.mat-mdc-raised-button.btn-cadastrar {
+  color: var(--primaria) !important;
+}
+
+/* remove o fundo preto do snackbar: quem pinta é o componente de alerta */
+.custom-snackbar .mdc-snackbar__surface {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ==========================================================================
+   PAINEL: o cartão branco de cada tela
+   ========================================================================== */
+
+.painel {
+  background: var(--bg-branco);
+  width: min(100% - 2em, 82em);
+  margin: 2em auto;
+  padding: 2em 1.5em 2.5em;
+  border-radius: 1.6em;
+  box-shadow: var(--sombra);
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1em;
+  margin-bottom: 1.6em;
+}
+
+.topo-texto {
+  flex: 1;
+  min-width: 12em;
+}
+
+.topo h1 {
+  font-family: var(--fonte-titulo);
+  font-size: clamp(1.5rem, 3.5vw, 2.1rem);
+  font-weight: 800;
+  color: var(--texto);
+  margin: 0;
+}
+
+.topo p {
+  margin: 0.2em 0 0;
+  color: var(--texto-suave);
+  font-size: 0.95rem;
+}
+
+.voltar {
+  padding: 0.4em 1em;
+  border-radius: 100px;
+  background: var(--primaria-suave);
+  color: var(--primaria);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.voltar:hover {
+  background: var(--destaque-claro);
+}
+
+.btn-novo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  padding: 0.7em 1.3em;
+  border: none;
+  border-radius: 100px;
+  background: var(--primaria);
+  color: var(--sobre-cor);
+  font-family: var(--fonte-titulo);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(47, 75, 124, 0.3);
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease;
+}
+
+.btn-novo:hover {
+  background: var(--primaria-clara);
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   FORMULÁRIO EM OVERLAY (toque no fundo fecha)
+   ========================================================================== */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1em;
+}
+
+.formulario {
+  background: var(--bg-branco);
+  border-radius: 1.4em;
+  padding: 1.8em;
+  width: min(100%, 32em);
+  max-height: 92vh;
+  max-height: 92dvh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9em;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.formulario h2 {
+  font-family: var(--fonte-titulo);
+  font-weight: 800;
+  margin: 0;
+  color: var(--texto);
+}
+
+.formulario label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.formulario input,
+.formulario textarea {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.6em 0.7em;
+  border: 1px solid var(--borda-cinza);
+  border-radius: 0.6em;
+  background: var(--bg-branco);
+  color: var(--texto);
+}
+
+.formulario input:focus,
+.formulario textarea:focus {
+  outline: 2px solid var(--primaria-clara);
+  outline-offset: 1px;
+}
+
+.formulario textarea {
+  resize: vertical;
+}
+
+.linha-dupla {
+  display: flex;
+  gap: 0.8em;
+}
+
+.linha-dupla label {
+  flex: 1;
+  min-width: 0;
+}
+
+.dica-cadastro {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+.dica-cadastro a {
+  color: var(--primaria);
+  font-weight: 600;
+}
+
+/* Tirar um dia é ação de risco menor que apagar, mas ainda é perda de dado:
+   fica fora da fileira de Salvar/Cancelar, com cara de aviso e não de erro,
+   para não ser tocado no lugar de Salvar. */
+.btn-tirar-dia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.6em 1em;
+  border: 2px solid var(--destaque);
+  border-radius: 100px;
+  background: transparent;
+  font-family: var(--fonte-titulo);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.btn-tirar-dia:hover {
+  background: var(--destaque-claro);
+}
+
+.btn-tirar-dia mat-icon {
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.form-botoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6em;
+  margin-top: 0.4em;
+}
+
+.form-botoes button {
+  padding: 0.6em 1.2em;
+  border-radius: 100px;
+  border: none;
+  font-family: var(--fonte-titulo);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-salvar {
+  background: var(--primaria);
+  color: var(--sobre-cor);
+}
+
+.btn-salvar:hover {
+  background: var(--primaria-clara);
+}
+
+.btn-cancelar {
+  background: var(--bg-botao-neutro);
+  color: var(--texto-suave);
+}
+
+.btn-cancelar:hover {
+  background: var(--borda-cinza);
+}
+
+.btn-apagar {
+  margin-right: auto;
+  background: transparent;
+  color: var(--erro);
+}
+
+.btn-apagar:hover {
+  background: rgba(180, 35, 35, 0.12);
+}
+
+/* ==========================================================================
+   CELULAR
+   O app é usado quase sempre no celular. O que vale para todas as telas fica
+   aqui; o que é de uma tela só fica no CSS dela.
+   ========================================================================== */
+
+html {
+  /* sem isto o iOS aumenta a fonte sozinho quando a tela gira */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* o flash azul do toque no Android suja a interface inteira; o retorno visual
+   fica por conta dos estados :active e :focus-visible de cada componente */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 100vh no celular inclui a barra de endereço, que some quando se rola a
+   página. dvh acompanha a barra; fica depois do 100vh como reforço. */
+body {
+  min-height: 100dvh;
+}
+
+@media (max-width: 900px) {
+  /* alvo de toque menor que ~44px é onde o dedo começa a errar */
+  button,
+  select,
+  [role='button'] {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 700px) {
+  /* o painel devolve ao conteúdo a largura que gastava em moldura */
+  .painel {
+    width: min(100% - 1.2em, 82em);
+    margin: 0.8em auto 1.2em;
+    padding: 1.4em 0.9em 1.8em;
+    border-radius: 1.2em;
+  }
+
+  .overlay {
+    padding: 0.6em;
+  }
+
+  .formulario {
+    padding: 1.3em 1.1em;
+  }
+}

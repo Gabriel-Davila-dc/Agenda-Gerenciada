@@ -1,0 +1,73 @@
+<section class="painel">
+  <header class="topo">
+    <a class="voltar" routerLink="/agenda">‹ Agenda</a>
+    <div class="topo-texto">
+      <h1>Cadastros</h1>
+      <p>As listas que aparecem quando você marca uma tarefa na agenda.</p>
+    </div>
+  </header>
+
+  <div class="grupos">
+    @for (grupo of grupos; track grupo.tipo) {
+      <article class="grupo">
+        <div class="grupo-topo">
+          <span class="grupo-icone"><mat-icon>{{ grupo.icone }}</mat-icon></span>
+          <div>
+            <h2>{{ grupo.titulo }}</h2>
+            <p>{{ grupo.descricao }}</p>
+          </div>
+        </div>
+
+        <ul class="itens">
+          @for (item of grupo.itens; track item.id) {
+            <li>
+              @if (estaEditando(item)) {
+                <input
+                  type="text"
+                  class="input-edicao"
+                  maxlength="255"
+                  [(ngModel)]="editando!.valor"
+                  (keyup.enter)="confirmarEdicao(grupo)"
+                  (keyup.escape)="cancelarEdicao()"
+                />
+                <span class="acoes">
+                  <button type="button" title="Salvar" (click)="confirmarEdicao(grupo)">
+                    <mat-icon>check</mat-icon>
+                  </button>
+                  <button type="button" title="Cancelar" (click)="cancelarEdicao()">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </span>
+              } @else {
+                <span>{{ item.nome }}</span>
+                <span class="acoes">
+                  <button type="button" class="btn-editar" title="Editar" (click)="editar(item)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button type="button" title="Remover" (click)="remover(grupo, item)">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </span>
+              }
+            </li>
+          }
+
+          @if (grupo.itens.length === 0) {
+            <li class="vazio">Nada cadastrado ainda.</li>
+          }
+        </ul>
+
+        <div class="adicionar">
+          <input
+            type="text"
+            maxlength="255"
+            [(ngModel)]="grupo.novo"
+            [placeholder]="grupo.placeholder"
+            (keyup.enter)="adicionar(grupo)"
+          />
+          <button type="button" (click)="adicionar(grupo)">Adicionar</button>
+        </div>
+      </article>
+    }
+  </div>
+</section>

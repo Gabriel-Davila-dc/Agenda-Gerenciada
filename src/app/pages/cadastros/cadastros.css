@@ -1,0 +1,173 @@
+:host {
+  display: block;
+}
+
+/* painel, topo e voltar vêm do styles.css: são os mesmos da agenda */
+
+.grupos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.4em;
+}
+
+.grupo {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-claro);
+  border-radius: 1.2em;
+  padding: 1.4em;
+  border-top: 5px solid var(--primaria);
+}
+
+.grupo-topo {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8em;
+  margin-bottom: 1em;
+}
+
+.grupo-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4em;
+  height: 2.4em;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--primaria-suave);
+  color: var(--primaria);
+}
+
+.grupo h2 {
+  font-family: var(--fonte-titulo);
+  font-size: 1.1rem;
+  margin: 0 0 0.2em;
+  color: var(--texto);
+}
+
+.grupo-topo p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--texto-suave);
+}
+
+.itens {
+  list-style: none;
+  margin: 0 0 1em;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  flex: 1;
+}
+
+.itens li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+  padding: 0.5em 0.5em 0.5em 0.8em;
+  background: var(--bg-branco);
+  border: 1px solid var(--borda-cinza);
+  border-radius: 0.6em;
+  font-size: 0.95rem;
+  color: var(--texto);
+}
+
+.itens li.vazio {
+  justify-content: center;
+  border-style: dashed;
+  color: var(--texto-suave);
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+.acoes {
+  display: inline-flex;
+  gap: 0.15em;
+  flex-shrink: 0;
+}
+
+.itens button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--erro);
+  border-radius: 50%;
+  padding: 0.2em;
+  cursor: pointer;
+}
+
+.itens button:hover {
+  background: rgba(180, 35, 35, 0.12);
+}
+
+.itens .btn-editar {
+  color: var(--primaria);
+}
+
+.itens .btn-editar:hover {
+  background: var(--primaria-suave);
+}
+
+.input-edicao {
+  flex: 1;
+  min-width: 0;
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.3em 0.5em;
+  border: 1px solid var(--primaria-clara);
+  border-radius: 0.4em;
+  color: var(--texto);
+}
+
+.input-edicao:focus {
+  outline: 2px solid var(--primaria-clara);
+  outline-offset: 1px;
+}
+
+.itens mat-icon {
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.adicionar {
+  display: flex;
+  gap: 0.4em;
+}
+
+.adicionar input {
+  flex: 1;
+  min-width: 0;
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.6em 0.7em;
+  border: 1px solid var(--borda-cinza);
+  border-radius: 0.6em;
+  background: var(--bg-branco);
+  color: var(--texto);
+}
+
+.adicionar input:focus {
+  outline: 2px solid var(--primaria-clara);
+  outline-offset: 1px;
+}
+
+.adicionar button {
+  padding: 0 1.1em;
+  border: none;
+  border-radius: 0.6em;
+  background: var(--primaria);
+  color: var(--sobre-cor);
+  font-family: var(--fonte-titulo);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.adicionar button:hover {
+  background: var(--primaria-clara);
+}

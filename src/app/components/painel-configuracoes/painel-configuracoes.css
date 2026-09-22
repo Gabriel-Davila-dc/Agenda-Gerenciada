@@ -1,0 +1,183 @@
+/* Sempre no DOM (não @if): permite a transição de entrada. Some de verdade
+   com pointer-events + inert — não só visualmente.
+   .painel-lateral (não ".painel", que já é o cartão branco global — colidir
+   com ele soma um `margin: 2em auto` que empurra isto para o centro). */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: none;
+  pointer-events: none;
+  transition:
+    background 200ms ease,
+    backdrop-filter 200ms ease;
+}
+
+.overlay.aberto {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  pointer-events: auto;
+}
+
+.painel-lateral {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: min(100%, 23em);
+  margin: 0;
+  padding: 1.4em 1.1em max(1.4em, env(safe-area-inset-bottom));
+  background: var(--bg-branco);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.18);
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.overlay.aberto .painel-lateral {
+  transform: translateX(0);
+}
+
+.painel-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4em;
+}
+
+.painel-topo h2 {
+  font-family: var(--fonte-titulo);
+  font-size: 1.15rem;
+  margin: 0;
+  color: var(--texto);
+}
+
+.btn-fechar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1em;
+  height: 2.1em;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.btn-fechar:hover {
+  background: var(--bg-claro);
+}
+
+.rotulo-secao {
+  margin: 1.5em 0 0.6em;
+  padding: 0 0.35em;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+}
+
+/* controle de 3 posições, tipo o seletor de aparência do Claude */
+.segmentado {
+  display: flex;
+  gap: 0.2em;
+  padding: 0.25em;
+  background: var(--bg-claro);
+  border-radius: 999px;
+}
+
+.segmentado button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2em;
+  flex: 1;
+  padding: 0.55em 0.3em 0.45em;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--texto-suave);
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 150ms ease,
+    color 150ms ease;
+}
+
+.segmentado button mat-icon {
+  font-size: 1.2rem;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.segmentado button:hover {
+  color: var(--texto);
+}
+
+.segmentado button.ativo {
+  background: var(--bg-branco);
+  color: var(--primaria);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.14);
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1em;
+}
+
+.linha {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  min-height: 46px;
+  padding: 0 0.5em;
+  border: none;
+  border-radius: 0.7em;
+  background: transparent;
+  color: var(--texto);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.linha:hover {
+  background: var(--bg-claro);
+}
+
+.linha > mat-icon:first-child {
+  color: var(--texto-suave);
+}
+
+.seta {
+  margin-left: auto;
+  color: var(--texto-suave);
+  font-size: 1.15rem;
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.linha-sair {
+  width: 100%;
+  margin-top: 1.4em;
+  padding-top: 1.2em;
+  border-top: 1px solid var(--borda-cinza);
+  color: var(--erro);
+}
+
+.linha-sair mat-icon {
+  color: var(--erro);
+}
+
+.linha-sair:hover {
+  background: rgba(180, 35, 35, 0.1);
+}

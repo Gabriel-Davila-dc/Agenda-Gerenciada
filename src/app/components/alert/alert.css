@@ -1,0 +1,30 @@
+div {
+  border-radius: 10px;
+  padding: 0.75em 1.4em;
+  box-shadow: 0 6px 16px rgba(46, 32, 19, 0.28);
+  justify-self: center;
+}
+
+.alert-sucesso {
+  background: var(--primaria);
+}
+.alert-aviso {
+  background: var(--destaque);
+}
+.alert-erro {
+  background: var(--erro);
+}
+
+p {
+  margin: 0;
+  text-align: center;
+  font-weight: 600;
+}
+
+.alert-sucesso p,
+.alert-erro p {
+  color: var(--sobre-cor);
+}
+.alert-aviso p {
+  color: var(--texto);
+}

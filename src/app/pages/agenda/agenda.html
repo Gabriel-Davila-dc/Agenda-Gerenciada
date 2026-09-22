@@ -1,0 +1,377 @@
+<section class="painel">
+  <header class="topo">
+    <div class="topo-texto">
+      <h1>Agenda</h1>
+      <p>
+        @switch (visao) {
+          @case ('calendario') {
+            @if (soFazendo) {
+              Cada tarefa aparece nos dias em que esteve em Fazendo.
+            } @else {
+              Toque num dia para marcar uma tarefa.
+            }
+          }
+          @case ('quadro') {
+            Arraste o card para mudar a tarefa de etapa.
+          }
+          @default {
+            O que você aprendeu, do mais recente para o mais antigo.
+          }
+        }
+      </p>
+    </div>
+    <div class="topo-botoes">
+      <button class="btn-diario" (click)="diarioDeHoje()">
+        <mat-icon>edit_note</mat-icon>
+        Diário de hoje
+      </button>
+      <button class="btn-novo" (click)="novo()">
+        <mat-icon>add</mat-icon>
+        Nova tarefa
+      </button>
+    </div>
+  </header>
+
+  <div class="barra">
+    <div class="alternador" role="tablist">
+      <button
+        role="tab"
+        [class.ativo]="visao === 'calendario'"
+        [attr.aria-selected]="visao === 'calendario'"
+        (click)="trocarVisao('calendario')"
+      >
+        Calendário
+      </button>
+      <button
+        role="tab"
+        [class.ativo]="visao === 'quadro'"
+        [attr.aria-selected]="visao === 'quadro'"
+        (click)="trocarVisao('quadro')"
+      >
+        Quadro
+      </button>
+      <button
+        role="tab"
+        [class.ativo]="visao === 'aprendizados'"
+        [attr.aria-selected]="visao === 'aprendizados'"
+        (click)="trocarVisao('aprendizados')"
+      >
+        Aprendizados
+      </button>
+    </div>
+
+    <div class="filtro">
+      @if (visao === 'calendario') {
+        <!-- mesmo visual do alternador: um botão só, aceso quando ligado -->
+        <div class="alternador">
+          <button
+            [class.ativo]="soFazendo"
+            [attr.aria-pressed]="soFazendo"
+            (click)="alternarSoFazendo()"
+          >
+            Só o que estava em Fazendo
+          </button>
+        </div>
+      }
+      <app-seletor
+        class="filtro-seletor"
+        aparencia="pilula"
+        titulo="Objetivo"
+        [opcoes]="opcoesFiltro"
+        [ngModel]="filtroObjetivo"
+        (ngModelChange)="filtrar($event)"
+      />
+      @if (filtroObjetivo) {
+        <div class="progresso">
+          <span>{{ progresso.feitas }} de {{ progresso.total }} feitas</span>
+          <span
+            class="progresso-barra"
+            role="progressbar"
+            [attr.aria-valuenow]="percentualFeito"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            [attr.aria-label]="'Progresso de ' + filtroObjetivo"
+          >
+            <span class="progresso-cheio" [style.width.%]="percentualFeito"></span>
+          </span>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (visao === 'calendario') {
+    <div class="calendario">
+      <button class="carregar-antes" (click)="carregarSemanaAnterior()">
+        ↑ carregar semanas anteriores
+      </button>
+
+      @for (semana of semanas; track semana.dias[0].iso) {
+        @if (semana.rotuloMes) {
+          <h2 class="mes">{{ semana.rotuloMes }}</h2>
+        }
+
+        <!-- só aparece na agenda do celular: lá os dias vêm empilhados e
+             nada mais marca onde uma semana acaba e a outra começa -->
+        <h3 class="semana-titulo" [class.semana-titulo-atual]="semana.contemHoje">
+          {{ semana.rotuloSemana }}
+        </h3>
+
+        <div class="semana" [class.semana-atual]="semana.contemHoje">
+          @for (dia of semana.dias; track dia.iso) {
+            <div class="dia" [class.dia-hoje]="dia.hoje">
+              <span class="dia-semana">{{ dia.diaSemana }}</span>
+              <button
+                class="dia-numero"
+                (click)="novoNoDia(dia.iso)"
+                [attr.aria-label]="'Marcar tarefa em ' + isoParaBR(dia.iso)"
+              >
+                {{ dia.numero }}
+              </button>
+
+              <div class="dia-tarefas">
+                @for (tarefa of dia.tarefas; track tarefa.id) {
+                  <button
+                    [class]="'etiqueta etapa-' + classeEtapa(tarefa.etapa)"
+                    (click)="editar(tarefa, dia.iso)"
+                    [title]="tituloDaEtiqueta(tarefa)"
+                  >
+                    <span class="etiqueta-nome">{{ tarefa.titulo || tarefa.tipo || 'Sem título' }}</span>
+                    @if (tarefa.objetivo) {
+                      <span class="etiqueta-objetivo">{{ tarefa.objetivo }}</span>
+                    }
+                  </button>
+                }
+
+                @if (dia.nota) {
+                  <button class="etiqueta-diario" (click)="abrirNota(dia.iso)" [title]="dia.nota.texto">
+                    <mat-icon>edit_note</mat-icon>
+                    <span>{{ dia.nota.texto }}</span>
+                  </button>
+                }
+
+                <div class="dia-acoes">
+                  <!-- dia livre na agenda do celular: na grade o número já é o
+                       alvo do toque, mas empilhado sobrava uma faixa larga e
+                       morta do lado dele -->
+                  @if (dia.tarefas.length === 0) {
+                    <button
+                      class="marcar-dia"
+                      (click)="novoNoDia(dia.iso)"
+                      [attr.aria-label]="'Marcar tarefa em ' + isoParaBR(dia.iso)"
+                    >
+                      + tarefa
+                    </button>
+                  }
+                  @if (!dia.nota) {
+                    <button
+                      class="marcar-diario"
+                      (click)="abrirNota(dia.iso)"
+                      [attr.aria-label]="'Escrever o diário de ' + isoParaBR(dia.iso)"
+                    >
+                      + diário
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <div class="quadro" cdkDropListGroup [hidden]="visao !== 'quadro'">
+    @for (coluna of colunas; track coluna.etapa) {
+      <div [class]="'coluna coluna-' + classeEtapa(coluna.etapa)">
+        <div class="coluna-topo">
+          <h2>{{ coluna.etapa }}</h2>
+          <span class="contador">{{ coluna.tarefas.length }}</span>
+        </div>
+
+        <div
+          class="lista"
+          cdkDropList
+          [cdkDropListData]="coluna.tarefas"
+          (cdkDropListDropped)="soltar($event, coluna.etapa)"
+        >
+          @for (tarefa of coluna.tarefas; track tarefa.id) {
+            <article class="card" cdkDrag (click)="editar(tarefa)">
+              <h3>{{ tarefa.titulo || tarefa.tipo || 'Sem título' }}</h3>
+              @if (tarefa.objetivo) {
+                <p class="card-objetivo">
+                  <mat-icon>flag</mat-icon>
+                  {{ tarefa.objetivo }}
+                </p>
+              }
+              @if (tarefa.area || tarefa.tipo) {
+                <p class="card-linha">
+                  <mat-icon>sell</mat-icon>
+                  {{ juntar(tarefa.area, tarefa.tipo) }}
+                </p>
+              }
+              @if (tarefa.dataInicio) {
+                <p class="card-linha">
+                  <mat-icon>event</mat-icon>
+                  {{ isoParaBR(tarefa.dataInicio) }}
+                  @if (tarefa.dataFim && tarefa.dataFim !== tarefa.dataInicio) {
+                    até {{ isoParaBR(tarefa.dataFim) }}
+                  }
+                </p>
+              }
+              @if (tarefa.descricao) {
+                <p class="card-descricao">{{ tarefa.descricao }}</p>
+              }
+              @if (tarefa.aprendizado) {
+                <p class="card-aprendizado">
+                  <mat-icon>lightbulb</mat-icon>
+                  <span>{{ tarefa.aprendizado }}</span>
+                </p>
+              }
+            </article>
+          }
+
+          @if (coluna.tarefas.length === 0) {
+            <p class="vazio">Nenhuma tarefa aqui.</p>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (visao === 'aprendizados') {
+    <app-aprendizados
+      [dias]="aprendizados"
+      [filtroObjetivo]="filtroObjetivo"
+      (abrir)="abrirAprendizado($event)"
+    />
+  }
+</section>
+
+<!-- FORMULÁRIO DA TAREFA -->
+@if (editando; as tarefa) {
+  <div class="overlay" (click)="fechar()">
+    <div class="formulario" (click)="$event.stopPropagation()">
+      <h2>{{ tarefa.id ? 'Editar tarefa' : 'Nova tarefa' }}</h2>
+
+      <label>
+        O que vou fazer
+        <input
+          type="text"
+          maxlength="255"
+          placeholder="Ex.: Estudar signals do Angular"
+          [(ngModel)]="tarefa.titulo"
+        />
+      </label>
+
+      <label>
+        Objetivo
+        @if (objetivos.length || tarefa.objetivo) {
+          <app-seletor
+            titulo="Objetivo"
+            [opcoes]="opcoes(objetivos, tarefa.objetivo)"
+            [(ngModel)]="tarefa.objetivo"
+          />
+        } @else {
+          <a class="sem-objetivo" routerLink="/cadastros">
+            <mat-icon>flag</mat-icon>
+            Cadastre seus objetivos para ligar tarefas a eles
+          </a>
+        }
+      </label>
+
+      <div class="linha-dupla">
+        <label>
+          Área
+          <app-seletor titulo="Área" [opcoes]="opcoes(areas, tarefa.area)" [(ngModel)]="tarefa.area" />
+        </label>
+        <label>
+          Tipo
+          <app-seletor titulo="Tipo" [opcoes]="opcoes(tipos, tarefa.tipo)" [(ngModel)]="tarefa.tipo" />
+        </label>
+      </div>
+
+      <div class="linha-dupla">
+        <label>
+          Início
+          <input type="date" [(ngModel)]="tarefa.dataInicio" />
+        </label>
+        <label>
+          Fim
+          <input type="date" [(ngModel)]="tarefa.dataFim" />
+        </label>
+      </div>
+
+      <label>
+        Etapa
+        <app-seletor titulo="Etapa" [opcoes]="etapas" [(ngModel)]="tarefa.etapa" />
+      </label>
+
+      <label>
+        Descrição
+        <textarea rows="2" maxlength="2000" [(ngModel)]="tarefa.descricao"></textarea>
+      </label>
+
+      <label class="campo-aprendizado">
+        <span><mat-icon>lightbulb</mat-icon> O que aprendi</span>
+        <textarea
+          rows="3"
+          maxlength="5000"
+          placeholder="O que ficou dessa tarefa? Aparece na aba Aprendizados."
+          [(ngModel)]="tarefa.aprendizado"
+        ></textarea>
+      </label>
+
+      <p class="dica-cadastro">
+        Faltou alguma opção nas listas?
+        <a routerLink="/cadastros">Abrir Cadastros</a>
+      </p>
+
+      <!-- só quando a tarefa pega mais de um dia e o formulário veio de um dia
+           do calendário: tirar o único dia seria apagar a tarefa -->
+      @if (podeTirarDoDia) {
+        <button class="btn-tirar-dia" (click)="tirarDoDia()">
+          <mat-icon>event_busy</mat-icon>
+          Tirar só do dia {{ rotuloDiaClicado }}
+        </button>
+      }
+
+      <div class="form-botoes">
+        @if (tarefa.id) {
+          <button class="btn-apagar" (click)="apagar(tarefa)">
+            {{ podeTirarDoDia ? 'Apagar tudo' : 'Apagar' }}
+          </button>
+        }
+        <button class="btn-cancelar" (click)="fechar()">Cancelar</button>
+        <button class="btn-salvar" (click)="salvar()">Salvar</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- FORMULÁRIO DO DIÁRIO -->
+@if (notaEditando; as nota) {
+  <div class="overlay" (click)="fecharNota()">
+    <div class="formulario formulario-diario" (click)="$event.stopPropagation()">
+      <h2><mat-icon>edit_note</mat-icon> Diário</h2>
+      <p class="diario-dia">{{ rotuloDoDia(nota.data) }}</p>
+
+      <label>
+        O que aprendi e como foi o dia
+        <textarea
+          rows="8"
+          maxlength="5000"
+          placeholder="Uma coisa que aprendi, o que funcionou, o que travou..."
+          [(ngModel)]="nota.texto"
+        ></textarea>
+      </label>
+
+      <div class="form-botoes">
+        @if (nota.existe) {
+          <button class="btn-apagar" (click)="apagarNota()">Apagar</button>
+        }
+        <button class="btn-cancelar" (click)="fecharNota()">Cancelar</button>
+        <button class="btn-salvar" (click)="salvarNota()">Salvar</button>
+      </div>
+    </div>
+  </div>
+}

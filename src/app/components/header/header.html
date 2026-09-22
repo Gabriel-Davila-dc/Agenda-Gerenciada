@@ -1,0 +1,17 @@
+<header class="barra-app">
+  <a class="marca" routerLink="/agenda" aria-label="Meu Dia, ir para a agenda">
+    <mat-icon>event_note</mat-icon>
+    <span class="marca-nome">Meu Dia</span>
+  </a>
+
+  <nav>
+    @if (logado) {
+      <a routerLink="/agenda" routerLinkActive="ativo">Agenda</a>
+      <button type="button" class="btn-config" aria-label="Configurações" (click)="abrirConfiguracoes.emit()">
+        <mat-icon>settings</mat-icon>
+      </button>
+    } @else {
+      <a routerLink="/login" routerLinkActive="ativo">Entrar</a>
+    }
+  </nav>
+</header>

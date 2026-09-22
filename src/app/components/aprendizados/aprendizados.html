@@ -1,0 +1,38 @@
+@if (filtroObjetivo) {
+  <p class="aviso-filtro">
+    Só os aprendizados das tarefas de <strong>{{ filtroObjetivo }}</strong>. O diário aparece com o
+    filtro em todos os objetivos.
+  </p>
+}
+
+@for (dia of dias; track dia.data) {
+  <section class="aprendizado-dia">
+    <h2 class="aprendizado-data">{{ dia.rotulo }}</h2>
+
+    @for (item of dia.itens; track item.chave) {
+      <button
+        class="aprendizado"
+        [class.aprendizado-diario]="item.origem === 'diario'"
+        (click)="abrir.emit(item)"
+      >
+        <span class="aprendizado-topo">
+          <mat-icon>{{ item.origem === 'diario' ? 'edit_note' : 'lightbulb' }}</mat-icon>
+          <span>{{ item.titulo }}</span>
+          @if (item.detalhe) {
+            <span class="aprendizado-detalhe">{{ item.detalhe }}</span>
+          }
+        </span>
+        <span class="aprendizado-texto">{{ item.texto }}</span>
+      </button>
+    }
+  </section>
+} @empty {
+  <div class="vazio-grande">
+    <mat-icon>lightbulb</mat-icon>
+    <p><strong>Nada anotado ainda.</strong></p>
+    <p>
+      Escreva no <strong>Diário de hoje</strong> ou preencha <strong>O que aprendi</strong> numa
+      tarefa: tudo aparece aqui, separado por dia.
+    </p>
+  </div>
+}

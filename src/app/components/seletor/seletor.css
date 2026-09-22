@@ -1,0 +1,271 @@
+:host {
+  display: block;
+  position: relative;
+}
+
+/* ---------- o campo fechado ---------- */
+
+/* de propósito igual ao input dos formulários: trocar o select nativo não pode
+   fazer o campo parecer de outra tela */
+.campo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.6em 0.7em;
+  border: 1px solid var(--borda-cinza);
+  border-radius: 0.6em;
+  background: var(--bg-branco);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: left;
+  color: var(--texto);
+  cursor: pointer;
+}
+
+.campo:focus-visible {
+  outline: 2px solid var(--primaria-clara);
+  outline-offset: 1px;
+}
+
+.campo:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* placeholder não é valor escolhido: precisa parecer mais apagado */
+.campo-vazio .campo-texto {
+  color: var(--texto-suave);
+  opacity: 0.65;
+}
+
+.campo-texto {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* variação da barra de filtros do histórico */
+.campo-pilula {
+  padding: 0.55em 0.9em;
+  border: 1.5px solid var(--primaria-suave);
+  border-radius: 100px;
+  background: var(--fundo-creme);
+  font-weight: 600;
+}
+
+.campo-pilula:hover {
+  border-color: var(--primaria-clara);
+}
+
+.campo-seta {
+  flex: none;
+  color: var(--primaria);
+}
+
+/* ---------- a folha ---------- */
+
+.fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.folha {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 32em);
+  max-height: 80vh;
+  padding: 0.4em 0 0.6em;
+  border-radius: 1.4em 1.4em 0 0;
+  background: var(--bg-branco);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.35);
+  animation: subir 0.18s ease-out;
+}
+
+@keyframes subir {
+  from {
+    transform: translateY(12%);
+  }
+}
+
+/* quem pediu menos animação não recebe o empurrão de baixo */
+@media (prefers-reduced-motion: reduce) {
+  .folha {
+    animation: none;
+  }
+}
+
+.folha-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6em;
+  padding: 0.5em 1em 0.6em;
+  border-bottom: 2px solid var(--primaria-suave);
+}
+
+.folha-topo h3 {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-size: 1.15rem;
+  color: var(--texto);
+}
+
+.fechar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: var(--bg-botao-neutro);
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.fechar:hover {
+  background: var(--borda-cinza);
+}
+
+/* ---------- busca ---------- */
+
+.busca {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin: 0.7em 1em 0.2em;
+  padding: 0.5em 0.7em;
+  border: 1px solid var(--borda-cinza);
+  border-radius: 0.6em;
+  background: var(--bg-claro);
+}
+
+.busca mat-icon {
+  flex: none;
+  color: var(--primaria);
+}
+
+.busca input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--texto);
+}
+
+.busca input:focus {
+  outline: none;
+}
+
+/* ---------- opções ---------- */
+
+.opcoes {
+  overflow-y: auto;
+  padding: 0.4em 0.6em 0;
+  /* rolagem que não arrasta a página atrás junto */
+  overscroll-behavior: contain;
+}
+
+.opcao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6em;
+  width: 100%;
+  /* alto de propósito: é o alvo do dedo de quem está no bananal */
+  min-height: 52px;
+  padding: 0.7em 0.8em;
+  border: none;
+  border-bottom: 1px solid var(--borda-cinza);
+  border-radius: 0.5em;
+  background: transparent;
+  font-family: inherit;
+  font-size: 1rem;
+  text-align: left;
+  color: var(--texto);
+  cursor: pointer;
+}
+
+.opcao:last-child {
+  border-bottom: none;
+}
+
+.opcao:hover {
+  background: var(--primaria-suave);
+}
+
+.opcao-marcada {
+  background: var(--destaque-claro);
+  font-weight: 700;
+}
+
+.opcao-check {
+  flex: none;
+  color: var(--primaria);
+}
+
+.vazio {
+  margin: 0;
+  padding: 1.4em 0.8em;
+  text-align: center;
+  color: var(--texto-suave);
+  opacity: 0.7;
+}
+
+/* ==================================================================
+   COMPUTADOR: no lugar da folha, um dropdown preso ao campo
+
+   O fundo escuro deixa de cobrir a tela e vira apenas o ancoradouro do
+   dropdown, medido a partir do :host. Quem fecha ao clicar fora, aqui, é o
+   listener de documento no componente.
+   ================================================================== */
+
+@media (min-width: 701px) {
+  .fundo {
+    position: absolute;
+    inset: auto;
+    top: calc(100% + 0.3em);
+    left: 0;
+    right: 0;
+    z-index: 1100;
+    display: block;
+    background: transparent;
+    backdrop-filter: none;
+  }
+
+  .folha {
+    width: 100%;
+    max-height: 20em;
+    padding: 0;
+    border: 1px solid var(--borda-cinza);
+    border-radius: 0.8em;
+    box-shadow: var(--sombra);
+    animation: none;
+  }
+
+  /* no dropdown o título repetiria o rótulo do campo logo acima */
+  .folha-topo {
+    display: none;
+  }
+
+  .busca {
+    margin: 0.6em 0.6em 0.2em;
+  }
+
+  .opcao {
+    min-height: 44px;
+    padding: 0.55em 0.7em;
+  }
+}

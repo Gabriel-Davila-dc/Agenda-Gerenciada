@@ -1,0 +1,75 @@
+.barra-app {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8em;
+  padding: 0.6em max(1em, env(safe-area-inset-right)) 0.6em max(1em, env(safe-area-inset-left));
+  background: var(--primaria);
+  color: var(--sobre-cor);
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  font-family: var(--fonte-titulo);
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+nav a,
+nav button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.9em;
+  border: none;
+  border-radius: 100px;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+nav a:hover,
+nav button:hover {
+  background: var(--primaria-clara);
+}
+
+nav a.ativo {
+  background: var(--bg-branco);
+  color: var(--primaria);
+}
+
+.btn-config {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  padding: 0;
+}
+
+.btn-config mat-icon {
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* em 360px "Meu Dia" some, sobra só o ícone do app e o menu */
+@media (max-width: 420px) {
+  .marca-nome {
+    display: none;
+  }
+}
