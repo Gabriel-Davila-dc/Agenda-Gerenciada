@@ -15,14 +15,14 @@
     </div>
   </div>
 
-  <form (ngSubmit)="logar()" class="cartao" novalidate>
+  <form (ngSubmit)="enviar()" class="cartao" novalidate>
     <div class="marca">
       <mat-icon>event_note</mat-icon>
       <span>Meu Dia</span>
     </div>
 
     <p class="mes">{{ mesAtual }}</p>
-    <h1>Entrar na conta</h1>
+    <h1>{{ criando ? 'Criar sua conta' : 'Entrar na conta' }}</h1>
 
     <label>
       Email
@@ -40,8 +40,8 @@
       Senha
       <input
         type="password"
-        placeholder="Sua senha"
-        autocomplete="current-password"
+        [placeholder]="criando ? 'Pelo menos 6 caracteres' : 'Sua senha'"
+        [attr.autocomplete]="criando ? 'new-password' : 'current-password'"
         [(ngModel)]="password"
         name="password"
         required
@@ -52,8 +52,12 @@
       <p class="erro" role="alert">{{ error }}</p>
     }
 
-    <button type="submit" class="entrar">Entrar</button>
+    <button type="submit" class="entrar">{{ criando ? 'Criar conta' : 'Entrar' }}</button>
 
-    <p class="rodape">Novo por aqui? <a routerLink="/register">Criar conta</a></p>
+    @if (criando) {
+      <p class="rodape">Já tem conta? <a routerLink="/login">Entrar</a></p>
+    } @else {
+      <p class="rodape">Novo por aqui? <a routerLink="/register">Criar conta</a></p>
+    }
   </form>
 </div>

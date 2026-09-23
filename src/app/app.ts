@@ -23,11 +23,11 @@ export class App {
   private alert = inject(AlertService);
   private router = inject(Router);
 
-  /** O login desenha a própria marca no cartão, por cima do calendário de fundo. */
+  /** Login e criar conta desenham a própria marca no cartão, por cima do calendário de fundo. */
   semTopo = toSignal(
     this.router.events.pipe(
       filter((e) => e instanceof NavigationEnd),
-      map(() => this.router.url.startsWith('/login')),
+      map(() => ['/login', '/register'].some((rota) => this.router.url.startsWith(rota))),
     ),
     { initialValue: false },
   );

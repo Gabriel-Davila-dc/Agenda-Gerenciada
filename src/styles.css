@@ -209,15 +209,6 @@ body {
   color-scheme: dark;
 }
 
-/* botões do Material no login: o tema pinta o rótulo por cima do CSS da tela */
-button.mat-mdc-raised-button.btn-entrar {
-  color: var(--sobre-cor) !important;
-}
-
-button.mat-mdc-raised-button.btn-cadastrar {
-  color: var(--primaria) !important;
-}
-
 /* remove o fundo preto do snackbar: quem pinta é o componente de alerta */
 .custom-snackbar .mdc-snackbar__surface {
   background-color: transparent !important;

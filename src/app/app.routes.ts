@@ -25,9 +25,11 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('./pages/login-page/login-page').then((m) => m.LoginPage),
   },
+  // criar conta é a tela de login no outro modo: mesmo cartão, mesmo fundo
   {
     path: 'register',
-    loadComponent: () => import('./pages/register-page/register-page').then((m) => m.RegisterPage),
+    loadComponent: () => import('./pages/login-page/login-page').then((m) => m.LoginPage),
+    data: { modo: 'criar' },
   },
   { path: '**', redirectTo: 'agenda' },
 ];

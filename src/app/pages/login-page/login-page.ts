@@ -1,10 +1,8 @@
-import { routes } from './../../app.routes';
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { UserService } from '../../services/user-service';
 
@@ -56,7 +54,15 @@ const TAREFAS_ENFEITE: Record<number, string[]> = {
   templateUrl: './login-page.html',
   styleUrl: './login-page.css',
 })
+/**
+ * Entrar e criar conta são a mesma tela: o mesmo cartão sobre o calendário de
+ * enfeite, só troca o texto e o que o botão faz. A rota diz o modo
+ * (data.modo = 'criar' em /register), para as duas nunca saírem do padrão
+ * uma da outra.
+ */
 export class LoginPage {
+  criando = inject(ActivatedRoute).snapshot.data['modo'] === 'criar';
+
   email = '';
   password = '';
   error = '';
@@ -74,7 +80,7 @@ export class LoginPage {
     private router: Router,
   ) {}
 
-  logar() {
+  enviar() {
     const erro = this.verificarCredenciais(this.email, this.password);
 
     if (erro) {
@@ -84,9 +90,27 @@ export class LoginPage {
     }
     this.error = '';
 
+    if (this.criando) {
+      this.criarConta();
+    } else {
+      this.logar();
+    }
+  }
+
+  // conta criada já entra: pedir o e-mail e a senha de novo seria à toa
+  private criarConta() {
+    this.userService.postUserRegister(this.email, this.password).subscribe({
+      next: () => this.logar(),
+      error: (err) => {
+        this.error = err.error?.message || 'Não deu para criar a conta. Tente de novo.';
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  private logar() {
     this.userService.getUserLogin(this.email, this.password).subscribe({
-      next: (usuario) => {
-        console.log('Usuário logado:', usuario);
+      next: () => {
         this.error = '';
         this.router.navigate(['/']).then(() => {
           window.location.reload();

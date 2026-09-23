@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  // troque pela URL pública da API antes de publicar em produção
-  apiUrl: 'http://localhost:3334',
+  // a API no Railway (domínio público; o .railway.internal só vale dentro do Railway)
+  apiUrl: 'https://agenda-gerenciada-api-production.up.railway.app',
 };
