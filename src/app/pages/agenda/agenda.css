@@ -10,26 +10,6 @@
   gap: 0.6em;
 }
 
-.btn-diario {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4em;
-  padding: 0.7em 1.2em;
-  border: 2px solid var(--diario);
-  border-radius: 100px;
-  background: transparent;
-  color: var(--diario);
-  font-family: var(--fonte-titulo);
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.btn-diario:hover {
-  background: var(--diario-suave);
-}
-
 /* ---------- alternador e filtro ---------- */
 
 .barra {

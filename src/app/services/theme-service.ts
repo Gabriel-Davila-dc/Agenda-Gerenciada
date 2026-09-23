@@ -1,10 +1,15 @@
 import { DOCUMENT, Injectable, computed, effect, inject, signal } from '@angular/core';
 
-export type Tema = 'claro' | 'escuro';
+export type Tema = 'claro' | 'escuro' | 'onix' | 'nebulosa';
 
 /** Mesma chave lida pelo script do index.html, que aplica o tema antes do app carregar. */
 const CHAVE_TEMA = 'tema';
-const COR_TEMA: Record<Tema, string> = { claro: '#2f4b7c', escuro: '#10141d' };
+const COR_TEMA: Record<Tema, string> = {
+  claro: '#2f4b7c',
+  escuro: '#10141d',
+  onix: '#131113',
+  nebulosa: '#0c0810',
+};
 
 /**
  * Tema claro/escuro. Sem escolha gravada, segue o sistema; ao escolher um
@@ -60,7 +65,7 @@ export class ThemeService {
 function lerTema(): Tema | null {
   try {
     const valor = localStorage.getItem('tema');
-    return valor === 'claro' || valor === 'escuro' ? valor : null;
+    return valor === 'claro' || valor === 'escuro' || valor === 'onix' || valor === 'nebulosa' ? valor : null;
   } catch {
     return null;
   }

@@ -4,7 +4,7 @@
   justify-content: space-between;
   gap: 0.8em;
   padding: 0.6em max(1em, env(safe-area-inset-right)) 0.6em max(1em, env(safe-area-inset-left));
-  background: var(--primaria);
+  background: var(--header-bg);
   color: var(--sobre-cor);
 }
 

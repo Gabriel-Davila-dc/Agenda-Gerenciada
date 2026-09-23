@@ -34,6 +34,8 @@ export class PainelConfiguracoes {
     { valor: null, titulo: 'Automático', icone: 'brightness_auto' },
     { valor: 'claro', titulo: 'Claro', icone: 'light_mode' },
     { valor: 'escuro', titulo: 'Escuro', icone: 'dark_mode' },
+    { valor: 'onix', titulo: 'Ônix', icone: 'star' },
+    { valor: 'nebulosa', titulo: 'Nebulosa', icone: 'auto_awesome' },
   ];
 
   abrir(): void {

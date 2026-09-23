@@ -66,6 +66,10 @@ body {
   /* TEXTO SOBRE COR FORTE: não muda de tema (ver comentário acima) */
   --sobre-cor: #fcfcfd;
 
+  /* Fundo do header. Só diverge de --primaria no tema Ônix, onde o topo é
+     escuro e --primaria vira dourado (usado no botão cheio, não na barra). */
+  --header-bg: var(--primaria);
+
   color-scheme: light;
 }
 
@@ -124,6 +128,76 @@ body {
     --erro: #ff6b70;
     color-scheme: dark;
   }
+}
+
+/* Tema Ônix: terceiro tema, preto quase puro com dourado — pedido explícito
+   por referência visual. --header-bg fica escuro (não dourado) de propósito:
+   só aqui ele diverge de --primaria, senão a barra do topo ficaria dourada
+   junto com o botão "+ Nova tarefa". */
+:root[data-theme='onix'] {
+  /* dourado puro, sem mistura marrom — o mesmo tom do --destaque, pra ser um
+     só "dourado" em vez de dois parecidos. Fundos neutros (sem tingir de
+     marrom): o brilho vem do contraste do dourado saturado contra o preto
+     de verdade, não de esquentar o preto. */
+  --primaria: #f2b134;
+  --primaria-clara: #ffc857;
+  --primaria-suave: rgba(242, 177, 52, 0.16);
+  --destaque: #f2b134;
+  --destaque-claro: rgba(242, 177, 52, 0.18);
+  --destaque-escuro: #ffd876;
+  --texto: #f5f5f2;
+  --texto-suave: #9c9994;
+  --fundo-creme: #1c1c1e;
+  --fundo-pagina: #0d0d0f;
+  --diario: #a48ee8;
+  --diario-suave: #2c2447;
+  --etapa-a-fazer: #8b8b90;
+  --etapa-fazendo: #6f97d6;
+  --etapa-travado: #f2b134;
+  --etapa-feito: #4caf7d;
+  --bg-claro: #19191b;
+  --bg-branco: #141416;
+  --bg-botao-neutro: #202023;
+  --borda-cinza: rgba(245, 245, 242, 0.12);
+  --sombra: 0 8px 28px rgba(0, 0, 0, 0.6);
+  --erro: #ff6b70;
+  --header-bg: #0a0a0b;
+  color-scheme: dark;
+}
+
+/* Tema Nebulosa: fundo em degradê (preto no canto superior esquerdo até
+   roxo/magenta no inferior direito, com dois brilhos suaves), acento magenta.
+   --header-bg vira transparente de propósito: o topo não é uma barra sólida
+   aqui, é o próprio degradê do body aparecendo por trás — repetir a cor do
+   body no header criaria uma emenda visível onde os dois se encontram. */
+:root[data-theme='nebulosa'] {
+  --primaria: #d946c4;
+  --primaria-clara: #ea6dd6;
+  --primaria-suave: rgba(217, 70, 196, 0.18);
+  --destaque: #f2b134;
+  --destaque-claro: rgba(242, 177, 52, 0.18);
+  --destaque-escuro: #ffd876;
+  --texto: #f5f0f7;
+  --texto-suave: #b8a8c2;
+  --fundo-creme: #241a2c;
+  --fundo-pagina:
+    radial-gradient(60% 50% at 78% 92%, rgba(199, 74, 190, 0.35), transparent 70%),
+    radial-gradient(45% 40% at 88% 62%, rgba(155, 45, 160, 0.3), transparent 70%),
+    linear-gradient(135deg, #08070a 0%, #1c1024 35%, #3a1a4a 65%, #5c2560 85%, #7a2f74 100%);
+  --diario: #5ecfc9;
+  --diario-suave: rgba(94, 207, 201, 0.16);
+  --etapa-a-fazer: #9a90a3;
+  --etapa-fazendo: #6f97d6;
+  --etapa-travado: #f2b134;
+  --etapa-feito: #4caf7d;
+  --bg-claro: #2a1f38;
+  --bg-branco: #221a30;
+  --bg-botao-neutro: #2f2440;
+  --borda-cinza: rgba(245, 240, 250, 0.12);
+  --sombra: 0 8px 28px rgba(0, 0, 0, 0.55);
+  --erro: #ff6b70;
+  --header-bg: transparent;
+  color-scheme: dark;
 }
 
 /* botões do Material no login: o tema pinta o rótulo por cima do CSS da tela */

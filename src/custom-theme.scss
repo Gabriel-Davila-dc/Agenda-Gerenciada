@@ -49,6 +49,38 @@ html[data-theme='escuro'] {
   }
 }
 
+// Tema Ônix: mesmo escuro, mas com primária amarela (a paleta pronta do
+// Material mais perto do dourado, sem puxar pra terracota) em vez de azul.
+html[data-theme='onix'] {
+  @include mat.theme(
+    (
+      color: (
+        theme-type: dark,
+        primary: mat.$yellow-palette,
+        tertiary: mat.$violet-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+// Tema Nebulosa: mesmo escuro, mas com primária magenta (acompanha o acento
+// do tema) e terciária ciano (o --diario daqui, pra não se perder no roxo).
+html[data-theme='nebulosa'] {
+  @include mat.theme(
+    (
+      color: (
+        theme-type: dark,
+        primary: mat.$magenta-palette,
+        tertiary: mat.$cyan-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
 body {
   // Set a default background, font and text colors for the application using
   // Angular Material's system-level CSS variables. Learn more about these

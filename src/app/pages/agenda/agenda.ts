@@ -375,10 +375,6 @@ export class Agenda {
     this.notaEditando = { data: iso, texto: nota?.texto ?? '', existe: !!nota };
   }
 
-  diarioDeHoje(): void {
-    this.abrirNota(hojeISO());
-  }
-
   salvarNota(): void {
     if (!this.notaEditando) {
       return;

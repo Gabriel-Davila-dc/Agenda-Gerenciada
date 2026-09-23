@@ -10,7 +10,8 @@
       // Tema escolhido em Configurações (ThemeService); aplicado antes do app para não piscar.
       try {
         var tema = localStorage.getItem('tema');
-        if (tema === 'claro' || tema === 'escuro') document.documentElement.dataset.theme = tema;
+        if (tema === 'claro' || tema === 'escuro' || tema === 'onix' || tema === 'nebulosa')
+          document.documentElement.dataset.theme = tema;
       } catch (e) {}
     </script>
     <link
