@@ -1,30 +1,67 @@
-div {
-  border-radius: 10px;
-  padding: 0.75em 1.4em;
-  box-shadow: 0 6px 16px rgba(46, 32, 19, 0.28);
-  justify-self: center;
+/* cartão do tema com a cor do tipo só no ícone e na borda: o texto fica na
+   cor normal, legível nos quatro temas */
+.alerta {
+  --cor-alerta: var(--primaria);
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  max-width: min(32em, calc(100vw - 2em));
+  padding: 0.7em 0.5em 0.7em 1em;
+  border: 1px solid color-mix(in srgb, var(--cor-alerta) 45%, var(--borda-cinza));
+  border-radius: 14px;
+  background: var(--bg-branco);
+  box-shadow: var(--sombra);
+  color: var(--texto);
 }
 
-.alert-sucesso {
-  background: var(--primaria);
+.alerta-sucesso {
+  --cor-alerta: var(--etapa-feito);
 }
-.alert-aviso {
-  background: var(--destaque);
+
+.alerta-aviso {
+  --cor-alerta: var(--destaque);
 }
-.alert-erro {
-  background: var(--erro);
+
+.alerta-erro {
+  --cor-alerta: var(--erro);
+}
+
+.icone {
+  flex: none;
+  color: var(--cor-alerta);
 }
 
 p {
+  flex: 1;
   margin: 0;
-  text-align: center;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
-.alert-sucesso p,
-.alert-erro p {
-  color: var(--sobre-cor);
+.fechar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--texto-suave);
+  cursor: pointer;
 }
-.alert-aviso p {
+
+.fechar:hover {
+  background: var(--bg-botao-neutro);
   color: var(--texto);
+}
+
+.fechar mat-icon {
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
 }

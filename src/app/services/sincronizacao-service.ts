@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 
 export type TipoOperacao = 'criar' | 'editar' | 'apagar';
 
@@ -47,6 +48,14 @@ export class SincronizacaoService {
   private handlers = new Map<string, HandlerSincronizacao>();
   private sincronizando = false;
   private retentativa: ReturnType<typeof setTimeout> | null = null;
+  private descartadasNaRodada = 0;
+
+  /**
+   * Quantas operações uma rodada teve de descartar (o servidor recusou para
+   * sempre). O App avisa na tela: antes elas sumiam só com o rastro no
+   * localStorage, e quem escreveu nunca ficava sabendo.
+   */
+  readonly aoDescartar = new Subject<number>();
 
   constructor() {
     // quando a conexão volta, tenta enviar o que ficou parado
@@ -182,6 +191,7 @@ export class SincronizacaoService {
     }
 
     this.sincronizando = true;
+    this.descartadasNaRodada = 0;
     let enviadas = 0;
 
     try {
@@ -233,6 +243,10 @@ export class SincronizacaoService {
       this.sincronizando = false;
     }
 
+    if (this.descartadasNaRodada) {
+      this.aoDescartar.next(this.descartadasNaRodada);
+    }
+
     const pendentes = this.fila().length;
 
     if (pendentes > 0 && navigator.onLine) {
@@ -282,6 +296,7 @@ export class SincronizacaoService {
 
     descartadas.push(op);
     localStorage.setItem(CHAVE_DESCARTADAS, JSON.stringify(descartadas));
+    this.descartadasNaRodada++;
   }
 
   descartadas(): Operacao[] {

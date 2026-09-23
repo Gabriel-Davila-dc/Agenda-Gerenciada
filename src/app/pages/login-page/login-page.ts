@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ChangeDetectorRef, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { UserService } from '../../services/user-service';
+import { mensagemDeErro } from '../../services/erros';
 
 /** Um quadradinho do calendário de enfeite atrás do cartão. */
 interface DiaEnfeite {
@@ -102,7 +103,14 @@ export class LoginPage {
     this.userService.postUserRegister(this.email, this.password).subscribe({
       next: () => this.logar(),
       error: (err) => {
-        this.error = err.error?.message || 'Não deu para criar a conta. Tente de novo.';
+        this.error = mensagemDeErro(
+          err,
+          {
+            409: 'Já existe uma conta com esse e-mail. Entre com ela.',
+            422: 'Confira o e-mail e use uma senha com pelo menos 6 caracteres.',
+          },
+          'Não deu para criar a conta. Tente de novo.',
+        );
         this.cdr.detectChanges();
       },
     });
@@ -119,7 +127,11 @@ export class LoginPage {
       error: (err) => {
         localStorage.removeItem('token'); // limpa token antigo
         localStorage.removeItem('email'); // limpa e-mail antigo
-        this.error = err.error?.message || 'Erro ao fazer Login';
+        this.error = mensagemDeErro(
+          err,
+          { 401: 'E-mail ou senha incorretos.', 422: 'Confira o e-mail e a senha.' },
+          'Não deu para entrar. Tente de novo.',
+        );
         this.cdr.detectChanges();
       },
     });
@@ -127,15 +139,15 @@ export class LoginPage {
 
   verificarCredenciais(email: string, senha: string): string | null {
     if (!email || !senha) {
-      return 'Preencha e-mail e senha!';
+      return 'Preencha o e-mail e a senha.';
     }
 
     if (!email.includes('@') || !email.includes('.')) {
-      return 'E-mail inválido!';
+      return 'Esse e-mail não parece válido. Confira se tem @ e o domínio.';
     }
 
     if (senha.length < 6) {
-      return 'A senha deve ter no mínimo 6 caracteres!';
+      return 'A senha precisa ter pelo menos 6 caracteres.';
     }
 
     return null; // tudo ok

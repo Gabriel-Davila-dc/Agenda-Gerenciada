@@ -1,25 +1,23 @@
-import { Component, Inject } from '@angular/core';
-import { MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
+import { Component, inject } from '@angular/core';
+import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
+
+import { TipoAlerta } from '../../services/alert-service';
+
+const ICONE: Record<TipoAlerta, string> = {
+  sucesso: 'check_circle',
+  aviso: 'info',
+  erro: 'error',
+};
 
 @Component({
   selector: 'app-alert',
-  imports: [],
+  imports: [MatIconModule],
   templateUrl: './alert.html',
   styleUrl: './alert.css',
 })
 export class Alert {
-  icon: any = '';
-  classe = 'alert-erro';
-  constructor(@Inject(MAT_SNACK_BAR_DATA) public data: any) {
-    if (this.data.tipo == 'sucess') {
-      this.icon = '✅';
-      this.classe = 'alert-sucesso';
-    } else if (this.data.tipo == 'alert') {
-      this.icon = '⚠️';
-      this.classe = 'alert-aviso';
-    } else {
-      this.icon = '❌';
-      this.classe = 'alert-erro';
-    }
-  }
+  protected data = inject<{ message: string; tipo: TipoAlerta }>(MAT_SNACK_BAR_DATA);
+  protected ref = inject(MatSnackBarRef);
+  protected icone = ICONE[this.data.tipo];
 }

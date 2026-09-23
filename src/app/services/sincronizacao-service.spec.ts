@@ -231,6 +231,22 @@ describe('SincronizacaoService', () => {
       expect(sinc.descartadas()[0].idLocal).toBe(-1);
     });
 
+    // o App mostra um alerta com esse número: antes sumia só com o rastro guardado
+    it('avisa quantas operações a rodada descartou', async () => {
+      const avisos: number[] = [];
+      sinc.aoDescartar.subscribe((quantas) => avisos.push(quantas));
+
+      sinc.enfileirar(RECURSO, 'criar', -1, { id: -1 });
+      sinc.enfileirar(RECURSO, 'criar', -2, { id: -2 });
+      handler.criar.and.returnValues(respostaComStatus(422), respostaComStatus(422));
+      await sinc.sincronizar();
+
+      // uma rodada sem descarte não avisa nada
+      await sinc.sincronizar();
+
+      expect(avisos).toEqual([2]);
+    });
+
     it('mantém na fila o que ainda pode dar certo depois (401, 408 e 429)', async () => {
       for (const status of [401, 408, 429]) {
         localStorage.clear();

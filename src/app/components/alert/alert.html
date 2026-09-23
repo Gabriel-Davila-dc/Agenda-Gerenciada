@@ -1,3 +1,7 @@
-<div [class]="classe">
-  <p>{{ icon }} {{ this.data.message }}</p>
+<div class="alerta" [class]="'alerta-' + data.tipo">
+  <mat-icon class="icone">{{ icone }}</mat-icon>
+  <p>{{ data.message }}</p>
+  <button type="button" class="fechar" aria-label="Fechar aviso" (click)="ref.dismiss()">
+    <mat-icon>close</mat-icon>
+  </button>
 </div>

@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { Header } from './components/header/header';
@@ -10,6 +10,7 @@ import { TarefasService } from './services/tarefas-service';
 import { NotasService } from './services/notas-service';
 import { CadastrosService } from './services/cadastros-service';
 import { ThemeService } from './services/theme-service';
+import { SincronizacaoService } from './services/sincronizacao-service';
 
 @Component({
   selector: 'app-root',
@@ -40,6 +41,19 @@ export class App {
     inject(NotasService);
     inject(CadastrosService);
     inject(ThemeService);
+
+    // o servidor recusou para sempre alguma alteração da fila: quem escreveu
+    // precisa saber, senão ela some sem ninguém perceber
+    inject(SincronizacaoService)
+      .aoDescartar.pipe(takeUntilDestroyed())
+      .subscribe((quantas) =>
+        this.alert.message(
+          quantas === 1
+            ? 'Uma alteração foi recusada pelo servidor e não foi salva.'
+            : `${quantas} alterações foram recusadas pelo servidor e não foram salvas.`,
+          'erro',
+        ),
+      );
   }
 
   async ngOnInit(): Promise<void> {
@@ -49,7 +63,10 @@ export class App {
     }
 
     if ((await this.userService.estadoDoToken()) === 'fora-do-ar') {
-      this.alert.message('Sem conexão: o que você anotar fica guardado e sobe depois', 'alert');
+      this.alert.message(
+        'Sem conexão com o servidor. O que você anotar fica guardado e sobe quando a conexão voltar.',
+        'aviso',
+      );
     }
   }
 }

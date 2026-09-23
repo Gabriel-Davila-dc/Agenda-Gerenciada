@@ -1,5 +1,5 @@
 import { ActivatedRoute, provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
@@ -10,6 +10,10 @@ import { RegisterResponse } from '../../Types/auth';
 
 describe('LoginPage', () => {
   let usuarios: jasmine.SpyObj<UserService>;
+
+  // o que o HttpClient entrega quando a API responde erro
+  const falha = (status: number, message: string) =>
+    throwError(() => new HttpErrorResponse({ status, error: { message } }));
 
   // a mesma tela nos dois modos: a rota diz qual
   function abrir(modo?: 'criar'): LoginPage {
@@ -34,20 +38,20 @@ describe('LoginPage', () => {
 
   it('em /login só entra', () => {
     const pagina = abrir();
-    usuarios.getUserLogin.and.returnValue(throwError(() => ({ error: { message: 'Senha inválida' } })));
+    usuarios.getUserLogin.and.returnValue(falha(401, 'E-mail ou senha incorretos'));
 
     pagina.enviar();
 
     expect(pagina.criando).toBeFalse();
     expect(usuarios.postUserRegister).not.toHaveBeenCalled();
-    expect(pagina.error).toBe('Senha inválida');
+    expect(pagina.error).toBe('E-mail ou senha incorretos.');
   });
 
   it('em /register cria a conta e já entra com ela', () => {
     const pagina = abrir('criar');
     const criada: RegisterResponse = { id: 1, email: 'eu@exemplo.com', createdAt: '', updatedAt: '' };
     usuarios.postUserRegister.and.returnValue(of(criada));
-    usuarios.getUserLogin.and.returnValue(throwError(() => ({ error: {} })));
+    usuarios.getUserLogin.and.returnValue(falha(401, ''));
 
     pagina.enviar();
 
@@ -58,11 +62,11 @@ describe('LoginPage', () => {
 
   it('conta que não pôde ser criada mostra o motivo e não tenta entrar', () => {
     const pagina = abrir('criar');
-    usuarios.postUserRegister.and.returnValue(throwError(() => ({ error: { message: 'Usuário já existe' } })));
+    usuarios.postUserRegister.and.returnValue(falha(409, 'Já existe uma conta com esse e-mail'));
 
     pagina.enviar();
 
-    expect(pagina.error).toBe('Usuário já existe');
+    expect(pagina.error).toBe('Já existe uma conta com esse e-mail. Entre com ela.');
     expect(usuarios.getUserLogin).not.toHaveBeenCalled();
   });
 
