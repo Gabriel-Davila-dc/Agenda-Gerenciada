@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ChangeDetectorRef, inject } from '@angular/core';
@@ -102,7 +102,6 @@ export class LoginPage {
   constructor(
     private userService: UserService,
     private cdr: ChangeDetectorRef,
-    private router: Router,
   ) {}
 
   enviar() {
@@ -153,9 +152,10 @@ export class LoginPage {
         this.error = '';
         // a agenda recarrega o app inteiro: o botão segue dizendo o que acontece
         this.mudarEtapa('abrindo');
-        this.router.navigate(['/']).then(() => {
-          window.location.reload();
-        });
+        // carga completa, e não navegação interna: o token novo precisa valer no
+        // app inteiro, e a aba pode estar com arquivos de um deploy anterior que
+        // já não existem no servidor (a agenda não abria depois de um deploy)
+        window.location.assign('/agenda');
       },
       error: (err) => {
         localStorage.removeItem('token'); // limpa token antigo

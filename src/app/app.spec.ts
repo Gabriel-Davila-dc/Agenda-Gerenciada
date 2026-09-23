@@ -3,7 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { App } from './app';
+import { App, recarregarSeFaltouArquivo } from './app';
 import { UserService } from './services/user-service';
 import { AlertService } from './services/alert-service';
 
@@ -45,5 +45,21 @@ describe('App', () => {
     const tela = fixture.nativeElement as HTMLElement;
 
     expect(tela.querySelector('router-outlet')).toBeTruthy();
+  });
+});
+
+// o caso positivo recarregaria a própria página de teste: fica só o que não recarrega
+describe('recarregarSeFaltouArquivo', () => {
+  afterEach(() => sessionStorage.removeItem('recarregou-por-deploy'));
+
+  it('erro que não é arquivo faltando não recarrega', () => {
+    expect(recarregarSeFaltouArquivo(new Error('Cannot match any routes'), '/agenda')).toBeFalse();
+  });
+
+  it('já recarregou nesta aba: não recarrega de novo, para não entrar em laço', () => {
+    sessionStorage.setItem('recarregou-por-deploy', '1');
+    const erro = new TypeError('Failed to fetch dynamically imported module: https://x/chunk-P6MOFDYO.js');
+
+    expect(recarregarSeFaltouArquivo(erro, '/agenda')).toBeFalse();
   });
 });
