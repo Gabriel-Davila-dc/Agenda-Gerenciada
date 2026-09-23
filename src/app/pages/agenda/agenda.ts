@@ -24,7 +24,7 @@ import { ETAPAS, Etapa, Tarefa, classeEtapa, tarefaVazia } from '../../models/ta
 import { Nota } from '../../models/nota';
 import { Aprendizado, DiaDeAprendizado } from '../../models/aprendizado';
 import { OpcaoSeletor, Seletor } from '../../components/seletor/seletor';
-import { Aprendizados } from '../../components/aprendizados/aprendizados';
+import { Aprendizados, EscritaNoCaderno } from '../../components/aprendizados/aprendizados';
 import { Busca } from '../../components/busca/busca';
 import { TarefasService } from '../../services/tarefas-service';
 import { NotasService } from '../../services/notas-service';
@@ -461,6 +461,17 @@ export class Agenda {
     if (indice >= 0) {
       this.indiceCaderno = indice;
     }
+  }
+
+  /** Escrito direto na pauta do caderno: vai pelos services, como o formulário. */
+  escreverNoCaderno(escrita: EscritaNoCaderno): void {
+    if (escrita.tarefa) {
+      this.tarefasService.salvar({ ...escrita.tarefa, aprendizado: escrita.texto });
+    } else {
+      // texto vazio apaga o diário do dia: o service cuida disso
+      this.notasService.salvarDoDia(escrita.data, escrita.texto);
+    }
+    this.carregar();
   }
 
   abrirAprendizado(item: Aprendizado): void {

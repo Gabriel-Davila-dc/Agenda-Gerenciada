@@ -381,6 +381,17 @@ describe('Agenda', () => {
         expect(component.diaCaderno!.data).toBe(SEXTA);
       });
 
+      it('escrever no caderno grava pelos services e entra na fila', () => {
+        abrir([{ ...ESTUDO, aprendizado: 'Signals' }]);
+
+        component.escreverNoCaderno({ data: SEXTA, texto: 'Signals e effects', tarefa: salva() });
+        expect(salva().aprendizado).toBe('Signals e effects');
+        expect(operacoesDe('tarefas').at(-1)!.tipo).toBe('editar');
+
+        component.escreverNoCaderno({ data: QUARTA, texto: 'Dia calmo' });
+        expect(notasService.doDia(QUARTA)!.texto).toBe('Dia calmo');
+      });
+
       it('sem anotação nenhuma, o caderno fica vazio', () => {
         abrir([], []);
 

@@ -9,26 +9,88 @@
           <h2 class="manuscrito">{{ titulo }}</h2>
 
           @for (entrada of entradas; track entrada.item.chave) {
-            <section
-              class="entrada"
-              role="button"
-              tabindex="0"
-              [attr.aria-label]="'Abrir ' + (entrada.titulo || entrada.item.titulo)"
-              (click)="abrir.emit(entrada.item)"
-              (keydown.enter)="abrir.emit(entrada.item)"
-            >
+            <section class="entrada" [class.escrevendo]="editando === entrada.item.chave">
               <span class="origem" [class.origem-diario]="entrada.item.origem === 'diario'">
                 <mat-icon>{{ entrada.item.origem === 'diario' ? 'edit_note' : 'lightbulb' }}</mat-icon>
                 {{ entrada.item.origem === 'diario' ? 'Diário do dia' : entrada.item.tarefa?.etapa }}
                 @if (entrada.item.detalhe) {
                   · {{ entrada.item.detalhe }}
                 }
+                <!-- o formulário completo (datas, etapa...) continua a um toque -->
+                <button
+                  type="button"
+                  class="abrir-formulario"
+                  [attr.aria-label]="'Abrir no formulário: ' + (entrada.titulo || entrada.item.titulo)"
+                  (click)="abrir.emit(entrada.item)"
+                >
+                  <mat-icon>open_in_new</mat-icon>
+                </button>
               </span>
-              @if (entrada.titulo) {
-                <h3>{{ entrada.titulo }}</h3>
+
+              @if (editando === entrada.item.chave) {
+                <!-- na tarefa o nome fica; o que se escreve é o "o que aprendi" -->
+                @if (entrada.item.origem === 'tarefa') {
+                  <h3>{{ entrada.titulo }}</h3>
+                }
+                <p
+                  #campo
+                  class="escrita"
+                  contenteditable="plaintext-only"
+                  role="textbox"
+                  aria-multiline="true"
+                  [attr.aria-label]="entrada.item.origem === 'diario' ? 'Diário do dia' : 'O que aprendi em ' + entrada.titulo"
+                  (input)="aoDigitar()"
+                  (blur)="concluir()"
+                  (keydown.escape)="desfazer()"
+                  (keydown.control.enter)="concluir()"
+                  (keydown.meta.enter)="concluir()"
+                ></p>
+                <span class="dica-escrita">Ctrl+Enter guarda · Esc desfaz</span>
+              } @else {
+                <!-- tocar no texto escreve ali mesmo, em cima da pauta -->
+                <div
+                  class="escrito"
+                  role="button"
+                  tabindex="0"
+                  [attr.aria-label]="'Escrever em ' + (entrada.titulo || entrada.item.titulo)"
+                  (click)="editar(entrada.item)"
+                  (keydown.enter)="editar(entrada.item)"
+                >
+                  @if (entrada.titulo) {
+                    <h3>{{ entrada.titulo }}</h3>
+                  }
+                  <p>{{ entrada.corpo }}</p>
+                </div>
               }
-              <p>{{ entrada.corpo }}</p>
             </section>
+          }
+
+          <!-- dia sem diário: as linhas em branco do fim são para escrever nele -->
+          @if (podeEscreverDiario) {
+            @if (editando === diarioNovo) {
+              <section class="entrada escrevendo">
+                <span class="origem origem-diario"><mat-icon>edit_note</mat-icon> Diário do dia</span>
+                <p
+                  #campo
+                  class="escrita"
+                  data-vazio="Como foi o dia, o que aprendi…"
+                  contenteditable="plaintext-only"
+                  role="textbox"
+                  aria-multiline="true"
+                  aria-label="Diário do dia"
+                  (input)="aoDigitar()"
+                  (blur)="concluir()"
+                  (keydown.escape)="desfazer()"
+                  (keydown.control.enter)="concluir()"
+                  (keydown.meta.enter)="concluir()"
+                ></p>
+                <span class="dica-escrita">Ctrl+Enter guarda · Esc desfaz</span>
+              </section>
+            } @else {
+              <button type="button" class="escrever-diario" (click)="escreverDiario()">
+                ✎ escrever o diário deste dia…
+              </button>
+            }
           }
 
           @if (etiquetas.length) {

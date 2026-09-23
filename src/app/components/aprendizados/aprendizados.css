@@ -96,17 +96,109 @@
 .entrada {
   margin: 0 -0.4em var(--linha);
   padding: 0 0.4em;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s ease;
 }
 
-.entrada:hover {
-  background: color-mix(in srgb, var(--primaria) 7%, transparent);
+/* tocar no texto escreve ali: o cursor já avisa que é para escrever */
+.escrito {
+  cursor: text;
 }
 
-.entrada:focus-visible {
+.escrito:focus-visible {
   outline: 2px solid var(--primaria-clara);
+  border-radius: 4px;
+}
+
+/* escrevendo: a linha da margem acende, como a margem vermelha do caderno */
+.escrevendo {
+  box-shadow: inset 2px 0 0 color-mix(in srgb, var(--primaria) 70%, transparent);
+}
+
+/* o parágrafo editável: sem caixa nenhuma, só o texto em cima da pauta, no
+   mesmo passo das linhas, correndo pelas duas páginas como na leitura */
+.escrita {
+  min-height: var(--linha);
+  margin: 0;
+  outline: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--texto);
+  caret-color: var(--primaria);
+  cursor: text;
+}
+
+.escrita:empty::before {
+  content: attr(data-vazio);
+  color: var(--texto-suave);
+  opacity: 0.6;
+}
+
+.dica-escrita {
+  display: block;
+  font-family: 'Caveat', cursive;
+  font-size: 1.1rem;
+  line-height: var(--linha);
+  color: var(--texto-suave);
+  opacity: 0.8;
+}
+
+/* as linhas em branco do fim de um dia sem diário */
+.escrever-diario {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: 'Caveat', cursive;
+  font-size: 1.35rem;
+  line-height: var(--linha);
+  min-height: 0;
+  text-align: left;
+  color: var(--texto-suave);
+  opacity: 0.6;
+  cursor: text;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.escrever-diario:hover,
+.escrever-diario:focus-visible {
+  opacity: 1;
+  color: var(--primaria);
+  outline: none;
+}
+
+/* o atalho para o formulário completo aparece ao chegar perto da anotação */
+.abrir-formulario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  min-height: 24px;
+  margin-left: auto;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--texto-suave);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.entrada:hover .abrir-formulario,
+.abrir-formulario:focus-visible {
+  opacity: 1;
+}
+
+.abrir-formulario:hover {
+  color: var(--primaria);
+}
+
+@media (hover: none) {
+  .abrir-formulario {
+    opacity: 0.7;
+  }
 }
 
 .origem {
