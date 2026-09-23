@@ -52,7 +52,14 @@
       <p class="erro" role="alert">{{ error }}</p>
     }
 
-    <button type="submit" class="entrar">{{ criando ? 'Criar conta' : 'Entrar' }}</button>
+    <button type="submit" class="entrar" [disabled]="ocupado" [attr.aria-busy]="ocupado">
+      @if (ocupado) {
+        <span class="girando" aria-hidden="true"></span>
+      }
+      {{ textoDoBotao }}
+    </button>
+    <!-- o leitor de tela anuncia cada etapa, que a mudança do botão sozinha não avisa -->
+    <span class="visually-hidden" aria-live="polite">{{ ocupado ? textoDoBotao : '' }}</span>
 
     @if (criando) {
       <p class="rodape">Já tem conta? <a routerLink="/login">Entrar</a></p>

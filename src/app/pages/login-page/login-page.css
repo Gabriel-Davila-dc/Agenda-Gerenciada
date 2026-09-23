@@ -201,6 +201,10 @@ input:focus {
 }
 
 .entrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
   margin-top: 0.4em;
   min-height: 44px;
   padding: 0.75em;
@@ -216,9 +220,38 @@ input:focus {
   transition: filter 0.2s ease, transform 0.15s ease;
 }
 
-.entrar:hover {
+.entrar:hover:not(:disabled) {
   filter: brightness(1.1);
   transform: translateY(-1px);
+}
+
+/* enviando: o botão fica, mais apagado, dizendo a etapa; não aceita outro clique */
+.entrar:disabled {
+  cursor: progress;
+  filter: saturate(0.7);
+  opacity: 0.85;
+}
+
+.girando {
+  flex: none;
+  width: 1em;
+  height: 1em;
+  border: 2px solid color-mix(in srgb, var(--sobre-cor) 35%, transparent);
+  border-top-color: var(--sobre-cor);
+  border-radius: 50%;
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .girando {
+    animation-duration: 2.4s;
+  }
 }
 
 .rodape {

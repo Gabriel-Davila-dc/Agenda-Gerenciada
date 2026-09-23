@@ -68,6 +68,30 @@ export class LoginPage {
   password = '';
   error = '';
 
+  /**
+   * O que está acontecendo depois do clique, para o botão dizer. Criar conta são
+   * dois pedidos seguidos (criar e entrar), e a API pode demorar alguns
+   * segundos para acordar: sem isso a tela parecia não ter feito nada.
+   */
+  etapa: 'parado' | 'criando' | 'entrando' | 'abrindo' = 'parado';
+
+  get ocupado(): boolean {
+    return this.etapa !== 'parado';
+  }
+
+  get textoDoBotao(): string {
+    switch (this.etapa) {
+      case 'criando':
+        return 'Criando sua conta…';
+      case 'entrando':
+        return 'Entrando…';
+      case 'abrindo':
+        return 'Abrindo sua agenda…';
+      default:
+        return this.criando ? 'Criar conta' : 'Entrar';
+    }
+  }
+
   /** "SETEMBRO DE 2026": o mês de hoje, em cima do título. */
   mesAtual = new Date()
     .toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
@@ -82,6 +106,11 @@ export class LoginPage {
   ) {}
 
   enviar() {
+    // segundo clique enquanto o primeiro ainda anda criaria a conta duas vezes
+    if (this.ocupado) {
+      return;
+    }
+
     const erro = this.verificarCredenciais(this.email, this.password);
 
     if (erro) {
@@ -100,6 +129,7 @@ export class LoginPage {
 
   // conta criada já entra: pedir o e-mail e a senha de novo seria à toa
   private criarConta() {
+    this.mudarEtapa('criando');
     this.userService.postUserRegister(this.email, this.password).subscribe({
       next: () => this.logar(),
       error: (err) => {
@@ -111,15 +141,18 @@ export class LoginPage {
           },
           'Não deu para criar a conta. Tente de novo.',
         );
-        this.cdr.detectChanges();
+        this.mudarEtapa('parado');
       },
     });
   }
 
   private logar() {
+    this.mudarEtapa('entrando');
     this.userService.getUserLogin(this.email, this.password).subscribe({
       next: () => {
         this.error = '';
+        // a agenda recarrega o app inteiro: o botão segue dizendo o que acontece
+        this.mudarEtapa('abrindo');
         this.router.navigate(['/']).then(() => {
           window.location.reload();
         });
@@ -132,9 +165,14 @@ export class LoginPage {
           { 401: 'E-mail ou senha incorretos.', 422: 'Confira o e-mail e a senha.' },
           'Não deu para entrar. Tente de novo.',
         );
-        this.cdr.detectChanges();
+        this.mudarEtapa('parado');
       },
     });
+  }
+
+  private mudarEtapa(etapa: LoginPage['etapa']) {
+    this.etapa = etapa;
+    this.cdr.detectChanges();
   }
 
   verificarCredenciais(email: string, senha: string): string | null {

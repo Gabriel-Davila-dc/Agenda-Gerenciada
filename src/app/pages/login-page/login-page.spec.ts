@@ -2,7 +2,7 @@ import { ActivatedRoute, provideRouter } from '@angular/router';
 import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
+import { Subject, of, throwError } from 'rxjs';
 
 import { LoginPage } from './login-page';
 import { UserService } from '../../services/user-service';
@@ -68,6 +68,36 @@ describe('LoginPage', () => {
 
     expect(pagina.error).toBe('Já existe uma conta com esse e-mail. Entre com ela.');
     expect(usuarios.getUserLogin).not.toHaveBeenCalled();
+  });
+
+  it('o botão diz cada etapa enquanto espera a API, e volta se der erro', () => {
+    const pagina = abrir('criar');
+    const criacao = new Subject<RegisterResponse>();
+    const entrada = new Subject<never>();
+    usuarios.postUserRegister.and.returnValue(criacao);
+    usuarios.getUserLogin.and.returnValue(entrada);
+
+    pagina.enviar();
+    expect(pagina.textoDoBotao).toBe('Criando sua conta…');
+    expect(pagina.ocupado).toBeTrue();
+
+    criacao.next({ id: 1, email: 'eu@exemplo.com', createdAt: '', updatedAt: '' });
+    expect(pagina.textoDoBotao).toBe('Entrando…');
+
+    entrada.error(new HttpErrorResponse({ status: 0 }));
+    expect(pagina.ocupado).toBeFalse();
+    expect(pagina.textoDoBotao).toBe('Criar conta');
+    expect(pagina.error).toContain('Sem conexão');
+  });
+
+  it('segundo clique enquanto o primeiro anda não cria a conta duas vezes', () => {
+    const pagina = abrir('criar');
+    usuarios.postUserRegister.and.returnValue(new Subject<RegisterResponse>());
+
+    pagina.enviar();
+    pagina.enviar();
+
+    expect(usuarios.postUserRegister).toHaveBeenCalledTimes(1);
   });
 
   it('senha curta nem chega a ir para a API', () => {
