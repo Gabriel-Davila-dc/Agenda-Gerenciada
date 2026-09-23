@@ -103,6 +103,18 @@ export function rotuloDoDia(iso: string): string {
   return `${DIAS_DA_SEMANA[data.getUTCDay()]}, ${data.getUTCDate()} de ${mes} de ${data.getUTCFullYear()}`;
 }
 
+/** "22 de setembro": a data escrita à mão no alto da página do caderno. */
+export function diaDoMes(iso: string): string {
+  const data = isoParaData(iso);
+  return `${data.getUTCDate()} de ${MESES[data.getUTCMonth()].toLowerCase()}`;
+}
+
+/** "Terça, 22 de setembro": o dia aberto no caderno, entre as setas. */
+export function rotuloCurtoDoDia(iso: string): string {
+  const semana = DIAS_DA_SEMANA[isoParaData(iso).getUTCDay()];
+  return `${semana[0].toUpperCase()}${semana.slice(1)}, ${diaDoMes(iso)}`;
+}
+
 // ocupa todos os dias entre início e fim, menos os tirados à mão; sem fim, só o início
 export function aconteceEm(tarefa: Intervalo, iso: string): boolean {
   if (!tarefa.dataInicio) {

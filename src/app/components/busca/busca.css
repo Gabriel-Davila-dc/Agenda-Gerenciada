@@ -1,0 +1,75 @@
+:host {
+  display: block;
+}
+
+.campo {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  min-height: 44px;
+  padding: 0 0.4em 0 0.8em;
+  border: 1px solid var(--borda-cinza);
+  border-radius: 100px;
+  background: var(--bg-botao-neutro);
+  color: var(--texto-suave);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.campo:focus-within {
+  border-color: color-mix(in srgb, var(--primaria) 60%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primaria) 18%, transparent);
+}
+
+/* filtro ligado: a lupa acende para lembrar que a tela não mostra tudo */
+.campo.ativo {
+  border-color: var(--primaria);
+  color: var(--primaria);
+}
+
+mat-icon {
+  flex: none;
+  font-size: 1.2rem;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 0.92rem;
+  color: var(--texto);
+}
+
+input::placeholder {
+  color: var(--texto-suave);
+  opacity: 0.8;
+}
+
+/* o "x" nativo do type=search some: o botão abaixo faz o mesmo em todo navegador */
+input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.limpar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.limpar:hover {
+  background: var(--primaria-suave);
+  color: var(--texto);
+}

@@ -4,14 +4,30 @@
     <span class="marca-nome">Meu Dia</span>
   </a>
 
-  <nav>
+  @if (logado) {
+    <!-- as abas da agenda moram no topo; em outra tela levam de volta a ela -->
+    <nav class="abas" aria-label="Visões da agenda">
+      @for (aba of abas; track aba.visao) {
+        <a
+          routerLink="/agenda"
+          [queryParams]="{ visao: aba.visao === 'calendario' ? null : aba.visao }"
+          [class.ativo]="naAgenda() && visao() === aba.visao"
+          [attr.aria-current]="naAgenda() && visao() === aba.visao ? 'page' : null"
+        >
+          {{ aba.rotulo }}
+        </a>
+      }
+    </nav>
+  }
+
+  <div class="acoes">
     @if (logado) {
-      <a routerLink="/agenda" routerLinkActive="ativo">Agenda</a>
       <button type="button" class="btn-config" aria-label="Configurações" (click)="abrirConfiguracoes.emit()">
         <mat-icon>settings</mat-icon>
       </button>
+      <span class="avatar" [title]="email" aria-hidden="true">{{ inicial }}</span>
     } @else {
-      <a routerLink="/login" routerLinkActive="ativo">Entrar</a>
+      <a routerLink="/login">Entrar</a>
     }
-  </nav>
+  </div>
 </header>

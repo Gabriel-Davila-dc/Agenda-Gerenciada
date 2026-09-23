@@ -1,6 +1,16 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  Injector,
+  ViewChild,
+  afterNextRender,
+  inject,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import {
@@ -15,6 +25,7 @@ import { Nota } from '../../models/nota';
 import { Aprendizado, DiaDeAprendizado } from '../../models/aprendizado';
 import { OpcaoSeletor, Seletor } from '../../components/seletor/seletor';
 import { Aprendizados } from '../../components/aprendizados/aprendizados';
+import { Busca } from '../../components/busca/busca';
 import { TarefasService } from '../../services/tarefas-service';
 import { NotasService } from '../../services/notas-service';
 import { CadastrosService } from '../../services/cadastros-service';
@@ -27,25 +38,32 @@ import {
   hojeISO,
   isoParaBR,
   isoParaData,
+  MESES,
+  rotuloCurtoDoDia,
   rotuloDaSemana,
   rotuloDoDia,
   rotuloDoMes,
   segundaDa,
   somarDias,
 } from '../../services/datas';
+import { filtrarPorBusca } from '../../services/busca';
+import { VisaoAgenda, visaoDaUrl } from './visao';
 
 interface Coluna {
   etapa: Etapa;
   tarefas: Tarefa[];
 }
 
-export type VisaoAgenda = 'calendario' | 'quadro' | 'aprendizados';
+export type { VisaoAgenda };
 
 interface DiaCalendario {
   iso: string;
   numero: number;
   diaSemana: string;
   hoje: boolean;
+  fimDeSemana: boolean;
+  // "OUT" no dia 1: marca a virada do mês dentro da grade
+  mesCurto: string | null;
   tarefas: Tarefa[];
   nota: Nota | null;
 }
@@ -55,6 +73,9 @@ interface SemanaCalendario {
   contemHoje: boolean;
   // preenchido só quando a semana começa um mês novo, para virar cabeçalho
   rotuloMes: string | null;
+  // o mesmo cabeçalho em duas partes, para o ano sair apagado ao lado do mês
+  nomeMes: string;
+  ano: string;
   // "8 a 14 de setembro": cabeçalho de cada semana na agenda do celular, onde
   // não existe grade de 7 colunas dizendo sozinha onde a semana termina
   rotuloSemana: string;
@@ -67,14 +88,13 @@ export interface NotaEditando {
   existe: boolean;
 }
 
-const DIAS_SEMANA = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM'];
+const DIAS_SEMANA = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
 
 // quanto o calendário mostra além da semana atual, e quanto cresce por clique
 const SEMANAS_ADIANTE = 8;
 const SEMANAS_POR_CLIQUE = 4;
 
 // o filtro de objetivo é conveniência de quem usa: fica só neste aparelho
-const CHAVE_FILTRO = 'agenda-filtro-objetivo';
 const CHAVE_SO_FAZENDO = 'agenda-filtro-fazendo';
 
 @Component({
@@ -88,6 +108,7 @@ const CHAVE_SO_FAZENDO = 'agenda-filtro-fazendo';
     DragDropModule,
     Seletor,
     Aprendizados,
+    Busca,
   ],
   templateUrl: './agenda.html',
   styleUrl: './agenda.css',
@@ -98,6 +119,10 @@ export class Agenda {
   protected classeEtapa = classeEtapa;
   protected isoParaBR = isoParaBR;
   protected rotuloDoDia = rotuloDoDia;
+  protected rotuloCurtoDoDia = rotuloCurtoDoDia;
+  protected diasSemana = DIAS_SEMANA;
+  // "SETEMBRO DE 2026", em cima da agenda
+  protected mesAtual = rotuloDoMes(isoParaData(hojeISO())).toUpperCase();
 
   // null = formulário fechado
   editando: Tarefa | null = null;
@@ -109,6 +134,8 @@ export class Agenda {
    * O quadro continua existindo porque mostra o andamento por etapa, mas no
    * celular ele exige rolagem lateral e um arrastar entre colunas fora da
    * tela — gesto que praticamente não se completa no dedo.
+   *
+   * As abas ficam no Header; a visão chega aqui pelo `?visao=` da URL.
    */
   visao: VisaoAgenda = 'calendario';
 
@@ -126,9 +153,16 @@ export class Agenda {
 
   aprendizados: DiaDeAprendizado[] = [];
 
-  // '' = todos os objetivos
-  filtroObjetivo = localStorage.getItem(CHAVE_FILTRO) ?? '';
-  progresso = { feitas: 0, total: 0 };
+  // o texto do campo de pesquisa; '' = mostra tudo. Não fica gravado: abrir a
+  // agenda com metade das tarefas escondida confundiria
+  consulta = '';
+
+  /**
+   * O caderno abre um dia por vez: 0 é o mais recente, e folhear para trás
+   * aumenta o índice. Os marcadores levam ao dia mais recente de cada mês.
+   */
+  indiceCaderno = 0;
+  mesesCaderno: { chave: string; rotulo: string }[] = [];
 
   /**
    * Calendário do que foi feito, não do que foi planejado.
@@ -141,7 +175,6 @@ export class Agenda {
   areas: string[] = [];
   tipos: string[] = [];
   objetivos: string[] = [];
-  opcoesFiltro: OpcaoSeletor[] = [];
 
   constructor(
     private tarefasService: TarefasService,
@@ -150,6 +183,15 @@ export class Agenda {
     private cd: ChangeDetectorRef,
   ) {
     // mostra o cache na hora e busca o servidor em seguida
+    inject(ActivatedRoute)
+      .queryParamMap.pipe(takeUntilDestroyed())
+      .subscribe((params) => {
+        this.visao = visaoDaUrl(params.get('visao'));
+        this.cd.markForCheck();
+        // a lista do calendário só existe na aba dele: mede quando ela aparece
+        afterNextRender(() => this.ajustarAltura(), { injector: this.injector });
+      });
+
     this.carregarCadastros();
     this.carregar();
     this.sincronizar();
@@ -172,16 +214,6 @@ export class Agenda {
     this.tipos = this.cadastros.listarNomes('tipos');
     this.objetivos = this.cadastros.listarNomes('objetivos');
 
-    // um objetivo que saiu do cadastro continua filtrável enquanto estiver escolhido
-    const nomes =
-      this.filtroObjetivo && !this.objetivos.includes(this.filtroObjetivo)
-        ? [this.filtroObjetivo, ...this.objetivos]
-        : this.objetivos;
-
-    this.opcoesFiltro = [
-      { valor: '', rotulo: 'Todos os objetivos' },
-      ...nomes.map((nome) => ({ valor: nome, rotulo: nome })),
-    ];
   }
 
   /**
@@ -199,31 +231,24 @@ export class Agenda {
   }
 
   carregar(): void {
-    const todas = this.tarefasService.listar();
-    const tarefas = this.filtroObjetivo
-      ? todas.filter((tarefa) => tarefa.objetivo === this.filtroObjetivo)
-      : todas;
-    const notas = this.notasService.listar();
+    // a pesquisa filtra as três visões: fica só o que é relevante para ela
+    const { tarefas, notas } = filtrarPorBusca(
+      this.consulta,
+      this.tarefasService.listar(),
+      this.notasService.listar(),
+    );
 
     this.colunas = ETAPAS.map((etapa) => ({
       etapa,
       tarefas: tarefas.filter((tarefa) => tarefa.etapa === etapa),
     }));
 
-    this.progresso = {
-      feitas: tarefas.filter((tarefa) => tarefa.etapa === 'Feito').length,
-      total: tarefas.length,
-    };
-
-    // o diário é do dia, não de um objetivo: no calendário ele aparece sempre,
-    // mas nos aprendizados filtrados sobra só o que veio das tarefas
     this.montarCalendario(tarefas, notas);
-    this.montarAprendizados(tarefas, this.filtroObjetivo ? [] : notas);
+    this.montarAprendizados(tarefas, notas);
   }
 
-  filtrar(objetivo: string): void {
-    this.filtroObjetivo = objetivo ?? '';
-    localStorage.setItem(CHAVE_FILTRO, this.filtroObjetivo);
+  pesquisar(consulta: string): void {
+    this.consulta = consulta;
     this.carregar();
   }
 
@@ -233,21 +258,64 @@ export class Agenda {
     this.carregar();
   }
 
-  get percentualFeito(): number {
-    return this.progresso.total
-      ? Math.round((this.progresso.feitas / this.progresso.total) * 100)
-      : 0;
-  }
-
-  trocarVisao(visao: VisaoAgenda): void {
-    this.visao = visao;
-  }
-
   // ---------- calendário ----------
+
+  /**
+   * O calendário rola sozinho, abaixo dos nomes SEG TER QUA...; o resto da
+   * tela (topo, filtros) fica parado. Só na grade: no celular os dias vêm
+   * empilhados e a página inteira rola, que é o gesto natural do dedo.
+   */
+  @ViewChild('rolagem') rolagem?: ElementRef<HTMLElement>;
+  private injector = inject(Injector);
+  private ultimoTopo = 0;
+
+  /** Clique no vazio do dia abre tarefa nova nele; tarefa, diário e botões têm o próprio clique. */
+  clicarNoDia(evento: MouseEvent, iso: string): void {
+    if (!(evento.target as HTMLElement).closest('button')) {
+      this.novoNoDia(iso);
+    }
+  }
 
   carregarSemanaAnterior(): void {
     this.semanasAntes += SEMANAS_POR_CLIQUE;
     this.carregar();
+  }
+
+  /**
+   * Chegou no topo rolando para cima: entram as semanas anteriores.
+   *
+   * Elas entram em cima do que está na tela, então a rolagem é corrigida
+   * pela diferença de altura; sem isso a lista pularia para o passado.
+   */
+  aoRolar(el: HTMLElement): void {
+    const subindo = el.scrollTop < this.ultimoTopo;
+    this.ultimoTopo = el.scrollTop;
+    if (!subindo || el.scrollTop > 40) {
+      return;
+    }
+
+    const doFim = el.scrollHeight - el.scrollTop;
+    this.carregarSemanaAnterior();
+    this.cd.markForCheck();
+    afterNextRender(
+      () => {
+        el.scrollTop = el.scrollHeight - doFim;
+        this.ultimoTopo = el.scrollTop;
+      },
+      { injector: this.injector },
+    );
+  }
+
+  // a lista vai do topo dela até o pé da tela, seja qual for a altura do
+  // cabeçalho e dos filtros em cima (que quebram linha em tela estreita)
+  @HostListener('window:resize')
+  ajustarAltura(): void {
+    const el = this.rolagem?.nativeElement;
+    if (el) {
+      // quem rola a página é o body (styles.css), não a janela
+      const rolado = document.body.scrollTop + window.scrollY;
+      el.style.setProperty('--topo-rolagem', `${el.getBoundingClientRect().top + rolado}px`);
+    }
   }
 
   private montarCalendario(tarefas: Tarefa[], notas: Nota[]): void {
@@ -279,6 +347,8 @@ export class Agenda {
           numero: data.getUTCDate(),
           diaSemana: DIAS_SEMANA[d],
           hoje: iso === hojeIso,
+          fimDeSemana: d >= 5,
+          mesCurto: data.getUTCDate() === 1 ? rotuloDoMes(data).slice(0, 3).toUpperCase() : null,
           tarefas: tarefas.filter((tarefa) =>
             this.soFazendo
               ? esteveNaEtapa(tarefa, 'Fazendo', iso, hojeIso)
@@ -292,11 +362,14 @@ export class Agenda {
       const mes = segunda.getUTCMonth();
       const novoMes = mes !== mesAnterior;
       mesAnterior = mes;
+      const [nomeMes, ano] = rotuloDoMes(segunda).split(' de ');
 
       semanas.push({
         dias,
         contemHoje: dias.some((dia) => dia.hoje),
         rotuloMes: novoMes ? rotuloDoMes(segunda) : null,
+        nomeMes,
+        ano,
         rotuloSemana: rotuloDaSemana(segunda, somarDias(segunda, 6)),
       });
     }
@@ -358,6 +431,36 @@ export class Agenda {
     this.aprendizados = [...porDia.entries()]
       .sort(([a], [b]) => b.localeCompare(a))
       .map(([data, itens]) => ({ data, rotulo: data ? rotuloDoDia(data) : 'Sem data', itens }));
+
+    // o dia aberto pode ter sumido (último aprendizado apagado): volta para dentro
+    this.folhear(0);
+
+    // "SET", "AGO"...: um marcador por mês, dos mais recentes, no máximo seis
+    const meses = [...new Set(this.aprendizados.map((dia) => dia.data.slice(0, 7)).filter(Boolean))];
+    this.mesesCaderno = meses.slice(0, 6).map((chave) => ({
+      chave,
+      rotulo: MESES[Number(chave.slice(5)) - 1].slice(0, 3).toUpperCase(),
+    }));
+  }
+
+  get diaCaderno(): DiaDeAprendizado | null {
+    return this.aprendizados[this.indiceCaderno] ?? null;
+  }
+
+  // numerado do começo, como um caderno de verdade: o dia mais antigo abre nas páginas 1 e 2
+  get paginaCaderno(): number {
+    return (this.aprendizados.length - this.indiceCaderno) * 2 - 1;
+  }
+
+  folhear(passo: number): void {
+    this.indiceCaderno = Math.max(0, Math.min(this.indiceCaderno + passo, this.aprendizados.length - 1));
+  }
+
+  irParaMes(chave: string): void {
+    const indice = this.aprendizados.findIndex((dia) => dia.data.startsWith(chave));
+    if (indice >= 0) {
+      this.indiceCaderno = indice;
+    }
   }
 
   abrirAprendizado(item: Aprendizado): void {
@@ -461,12 +564,11 @@ export class Agenda {
 
   // ---------- formulário da tarefa ----------
 
-  // tocar num dia já abre o formulário com a data preenchida; com filtro
-  // ligado, a tarefa nova já nasce no objetivo que está na tela
+  // tocar num dia já abre o formulário com a data preenchida
   novoNoDia(iso: string): void {
     // tarefa nova não tem o que tirar: o botão do dia fica fora
     this.diaClicado = null;
-    this.editando = tarefaVazia(iso, this.filtroObjetivo);
+    this.editando = tarefaVazia(iso);
   }
 
   novo(): void {
@@ -530,7 +632,7 @@ export class Agenda {
     this.tarefasService.reordenar(this.colunas.flatMap((coluna) => coluna.tarefas.map((t) => t.id)));
 
     if (mudouDeEtapa) {
-      // progresso e calendário acompanham a etapa nova
+      // o calendário acompanha a etapa nova
       this.carregar();
     }
   }

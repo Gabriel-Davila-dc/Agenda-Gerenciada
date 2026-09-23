@@ -4,85 +4,18 @@
 
 /* painel, topo, btn-novo e o formulário em overlay vêm do styles.css */
 
-.topo-botoes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6em;
-}
-
-/* ---------- alternador e filtro ---------- */
-
-.barra {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.8em 1.2em;
-  margin-bottom: 1.2em;
-}
-
-.alternador {
-  display: flex;
-  gap: 0.3em;
-  padding: 0.3em;
-  border-radius: 100px;
-  background: var(--bg-botao-neutro);
-}
-
-.alternador button {
-  border: none;
-  background: transparent;
-  padding: 0.55em 1.2em;
-  border-radius: 100px;
-  font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--texto-suave);
-  cursor: pointer;
-  min-height: 44px;
-}
-
-.alternador button.ativo {
-  background: var(--primaria);
-  color: var(--sobre-cor);
-  box-shadow: 0 2px 6px rgba(31, 39, 51, 0.3);
-}
+/* ---------- filtros e nova tarefa, à direita do topo ---------- */
 
 .filtro {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.6em 1em;
-}
-
-.filtro-seletor {
-  min-width: 14em;
-}
-
-.progresso {
-  display: flex;
-  align-items: center;
+  justify-content: flex-end;
   gap: 0.6em;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--texto-suave);
 }
 
-.progresso-barra {
-  display: block;
-  width: 7em;
-  height: 0.55em;
-  border-radius: 100px;
-  background: var(--bg-botao-neutro);
-  overflow: hidden;
-}
-
-.progresso-cheio {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--etapa-feito);
-  transition: width 0.3s ease;
+.filtro-busca {
+  width: 18em;
 }
 
 /* ---------- quadro ---------- */
@@ -249,21 +182,45 @@
 .calendario {
   display: flex;
   flex-direction: column;
-  gap: 0.5em;
+  gap: 0.6em;
+}
+
+/* SEG TER QUA...: só os nomes, parados em cima da lista que rola */
+.cabecalho-semana {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.6em;
+  padding: 0 1em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--texto-suave);
+}
+
+/* a lista rola sozinha, do topo dela até o pé da tela (altura medida no ts) */
+.rolagem {
+  background: radial-gradient(60% 60% at 85% 85%, color-mix(in srgb, var(--primaria) 18%, transparent), transparent 70%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  height: calc(100dvh - var(--topo-rolagem, 14em) - 2em);
+  min-height: 20em;
+  overflow-y: auto;
+  padding: 1em 0.6em;
 }
 
 .carregar-antes {
-  align-self: center;
+  align-self: flex-end;
   border: none;
   background: transparent;
-  padding: 0.7em 1.2em;
+  padding: 0.5em 1em;
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--primaria);
   cursor: pointer;
   border-radius: 100px;
-  min-height: 44px;
+  min-height: 36px;
 }
 
 .carregar-antes:hover {
@@ -271,54 +228,93 @@
 }
 
 .mes {
-  margin: 0.8em 0 0.2em;
+  margin: 0.6em 0 0;
   font-family: var(--fonte-titulo);
-  font-size: 1.4rem;
+  font-size: 1.7rem;
+  font-weight: 800;
   color: var(--texto);
+}
+
+.mes span {
+  color: var(--texto-suave);
+  font-weight: 700;
+  opacity: 0.7;
 }
 
 /* sete colunas iguais: minmax(0,1fr) e não 1fr, senão uma etiqueta comprida
    alarga a coluna e desalinha a semana inteira */
 .semana {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 0.3em;
-  padding: 0.3em;
-  border: 2px solid transparent;
-  border-radius: 0.8em;
+  gap: 0.6em;
+  padding: 0.5em;
+  border: 1px solid transparent;
+  border-radius: 1em;
 }
 
-/* a semana de hoje ganha moldura: referência imediata ao abrir a tela */
+/* a semana de hoje: só um fundo leve e o selo "Esta semana", sem moldura nem
+   brilho em volta (competiam com o dia de hoje) */
 .semana-atual {
-  border-color: var(--destaque);
+  margin: 0.9em 0 0.6em;
+  background: color-mix(in srgb, var(--primaria) 5%, transparent);
+}
+
+.selo-semana {
+  position: absolute;
+  top: 0;
+  right: 1.2em;
+  transform: translateY(-50%);
+  padding: 0.2em 0.8em;
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--primaria), var(--primaria-clara));
+  color: var(--sobre-cor);
+  font-size: 0.7rem;
+  font-weight: 700;
 }
 
 .dia {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.15em;
-  min-height: 5em;
-  padding: 0.3em 0.15em;
-  border-radius: 0.6em;
-  background: var(--bg-claro);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-content: start;
+  gap: 0.35em;
+  min-height: clamp(12.5em, 25vh, 20em);
+  cursor: pointer;
   min-width: 0;
+  padding: 0.5em;
+  border: 1px solid var(--borda-cinza);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bg-branco) 55%, transparent);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+/* o mesmo do calendário do login: o dia sobe, cresce e brilha na cor do
+   tema, por cima dos vizinhos */
+@media (hover: hover) {
+  .dia:hover {
+    position: relative;
+    z-index: 1;
+    transform: translateY(-8px) scale(1.05);
+    border-color: color-mix(in srgb, var(--primaria) 60%, transparent);
+    box-shadow: 0 22px 44px color-mix(in srgb, var(--primaria) 30%, transparent);
+  }
 }
 
 .dia-semana {
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--primaria);
+  display: none;
 }
 
 .dia-numero {
+  justify-self: start;
   border: none;
   background: transparent;
-  font-family: inherit;
-  font-size: 1rem;
+  font-family: var(--fonte-titulo);
+  font-size: 1.05rem;
   font-weight: 700;
-  color: var(--texto);
+  color: var(--texto-suave);
   cursor: pointer;
   width: 1.9em;
   height: 1.9em;
@@ -330,80 +326,106 @@
   background: var(--primaria-suave);
 }
 
+.fim-de-semana .dia-numero {
+  color: var(--primaria-clara);
+}
+
+.dia-hoje {
+  border-color: color-mix(in srgb, var(--primaria) 70%, transparent);
+  background: color-mix(in srgb, var(--primaria) 18%, color-mix(in srgb, var(--bg-branco) 55%, transparent));
+  box-shadow: 0 18px 40px color-mix(in srgb, var(--primaria) 30%, transparent);
+  transform: translateY(-6px);
+}
+
 .dia-hoje .dia-numero {
-  background: var(--destaque);
   color: var(--texto);
+}
+
+/* "OUT" no dia 1: a virada do mês no meio da semana */
+.mes-curto {
+  align-self: center;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--texto-suave);
 }
 
 .dia-tarefas {
+  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
-  gap: 0.15em;
-  width: 100%;
+  gap: 0.25em;
   min-width: 0;
 }
 
-/* a etiqueta corta com reticências: o nome inteiro fica no title e no toque */
-.etiqueta {
-  display: block;
-  width: 100%;
-  border: none;
-  border-radius: 0.4em;
-  padding: 0.25em 0.4em;
-  font-family: inherit;
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-align: left;
-  color: var(--sobre-cor);
-  cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.etiqueta:hover {
-  filter: brightness(1.1);
-}
-
-/* mesmas cores das colunas do quadro, para as duas visões combinarem */
+/* cada etapa pinta a etiqueta pela mesma variável: bolinha cheia e fundo
+   leve, nas cores das colunas do quadro para as duas visões combinarem */
 .etapa-a-fazer {
-  background: var(--etapa-a-fazer);
+  --cor-etapa: var(--etapa-a-fazer);
 }
 .etapa-fazendo {
-  background: var(--etapa-fazendo);
+  --cor-etapa: var(--etapa-fazendo);
 }
 .etapa-travado {
-  background: var(--etapa-travado);
-  color: var(--texto);
+  --cor-etapa: var(--etapa-travado);
 }
 .etapa-feito {
-  background: var(--etapa-feito);
+  --cor-etapa: var(--etapa-feito);
 }
 
-.etiqueta-nome {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* o diário do dia: tracejado e roxo, para não se confundir com tarefa */
+/* tarefa e diário dividem o formato; o nome corta com reticências e fica
+   inteiro no title e no toque */
+.etiqueta,
 .etiqueta-diario {
   display: flex;
   align-items: center;
-  gap: 0.2em;
+  gap: 0.4em;
   width: 100%;
   min-width: 0;
-  border: 1px dashed var(--diario);
-  border-radius: 0.4em;
-  padding: 0.2em 0.35em;
-  background: var(--diario-suave);
-  color: var(--diario);
+  border: none;
+  border-radius: 6px;
+  padding: 0.25em 0.5em;
   font-family: inherit;
-  font-size: 0.65rem;
-  font-weight: 700;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.3;
   text-align: left;
   cursor: pointer;
+}
+
+.etiqueta {
+  /* fundo sólido: a cor da etapa misturada ao fundo do cartão, sem deixar o dia
+     aparecer por trás e apagar o nome */
+  background: color-mix(in srgb, var(--cor-etapa) 28%, var(--bg-branco));
+  color: var(--texto);
+}
+
+.etiqueta::before {
+  content: '';
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cor-etapa);
+}
+
+.etiqueta:hover {
+  filter: brightness(1.15);
+}
+
+.etiqueta-nome {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* o diário do dia: tracejado e na cor do diário, para não parecer tarefa */
+.etiqueta-diario {
+  gap: 0.2em;
+  border: 1px dashed var(--diario);
+  background: var(--diario-suave);
+  color: var(--diario);
 }
 
 .etiqueta-diario mat-icon {
@@ -421,7 +443,6 @@
 
 .dia-acoes {
   display: flex;
-  justify-content: center;
   width: 100%;
 }
 
@@ -438,9 +459,9 @@
   border: none;
   border-radius: 0.3em;
   background: transparent;
-  padding: 0.1em 0.3em;
+  padding: 0.1em 0.2em;
   font-family: inherit;
-  font-size: 0.62rem;
+  font-size: 0.65rem;
   font-weight: 700;
   color: var(--diario);
   cursor: pointer;
@@ -462,60 +483,46 @@
 
 /* a aba Aprendizados tem componente e CSS próprios (components/aprendizados) */
 
-/* ---------- formulários: o que é só da agenda ---------- */
-
-.formulario .campo-aprendizado {
-  color: var(--diario);
-}
-
-.campo-aprendizado span {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25em;
-}
-
-.campo-aprendizado mat-icon {
-  font-size: 1.1rem;
-  width: 1.1rem;
-  height: 1.1rem;
-}
-
-.formulario .campo-aprendizado textarea {
-  border-color: var(--diario);
-  background: var(--diario-suave);
-}
-
-.sem-objetivo {
-  display: flex;
-  align-items: center;
-  gap: 0.4em;
-  min-height: 44px;
-  padding: 0.6em 0.7em;
-  border: 1px dashed var(--primaria-clara);
-  border-radius: 0.6em;
-  color: var(--primaria);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.formulario-diario h2 {
-  display: flex;
-  align-items: center;
-  gap: 0.3em;
-  color: var(--diario);
-}
-
-.diario-dia {
-  margin: -0.5em 0 0;
-  font-weight: 600;
-  color: var(--texto-suave);
-}
-
-.diario-dia::first-letter {
-  text-transform: uppercase;
-}
-
 /* ---------- telas médias: o quadro rola para o lado ---------- */
+
+/* notebook pequeno e tablet: os filtros descem para uma linha inteira e a
+   pesquisa estica; a grade aperta os vãos e os dias baixam um pouco */
+@media (max-width: 1100px) {
+  .filtro {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .filtro-busca {
+    flex: 1;
+    min-width: 14em;
+  }
+
+  .semana,
+  .cabecalho-semana {
+    gap: 0.4em;
+  }
+
+  .dia {
+    min-height: clamp(9em, 20vh, 14em);
+    padding: 0.4em;
+  }
+
+  .etiqueta,
+  .etiqueta-diario {
+    font-size: 0.72rem;
+  }
+}
+
+/* tela baixa (celular deitado, notebook com zoom): rolagem dentro de rolagem
+   sobra pouca lista, então volta a rolar a página inteira */
+@media (max-height: 560px) {
+  .rolagem {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+}
 
 @media (max-width: 900px) {
   .quadro {
@@ -533,27 +540,28 @@
    ================================================================== */
 
 @media (max-width: 700px) {
-  .topo-botoes {
-    width: 100%;
-  }
-
-  .topo-botoes button {
-    flex: 1;
-  }
-
-  .alternador {
-    width: 100%;
-  }
-
-  .alternador button {
-    flex: 1;
-    padding: 0.55em 0.4em;
-    font-size: 0.88rem;
-  }
-
   .filtro,
-  .filtro-seletor {
+  .filtro-busca,
+  .interruptor,
+  .btn-novo {
     width: 100%;
+  }
+
+  /* empilhado, cada dia já diz o nome da semana e o mês vem no cabeçalho */
+  .rolagem {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .cabecalho-semana,
+  .selo-semana,
+  .mes-curto {
+    display: none;
+  }
+
+  .carregar-antes {
+    align-self: center;
   }
 
   .mes {
@@ -580,7 +588,7 @@
 
   .semana-titulo-atual {
     color: var(--texto);
-    border-bottom-color: var(--destaque);
+    border-bottom-color: var(--primaria);
   }
 
   .semana {
@@ -589,14 +597,10 @@
     gap: 0;
     padding: 0;
     background: var(--bg-branco);
-    border: 2px solid var(--borda-cinza);
+    border: 1px solid var(--borda-cinza);
     border-radius: 1em;
     /* segura o canto arredondado sobre o fundo do primeiro e do último dia */
     overflow: hidden;
-  }
-
-  .semana-atual {
-    border-color: var(--destaque);
   }
 
   .dia {
@@ -609,8 +613,15 @@
     gap: 0 0.7em;
     min-height: 4.4em;
     padding: 0.7em 0.8em;
+    border: none;
     border-radius: 0;
     background: transparent;
+    box-shadow: none;
+  }
+
+  .dia:hover,
+  .dia-hoje {
+    transform: none;
   }
 
   /* a divisória entre os dias, que era o vão da grade */
@@ -634,7 +645,7 @@
 
   /* o dia de hoje se acha de longe: faixa pintada e etiqueta embaixo do dia */
   .dia-hoje {
-    background: var(--destaque-claro);
+    background: var(--primaria-suave);
   }
 
   .dia-hoje .dia-semana::after {
@@ -655,15 +666,13 @@
   }
 
   .dia-hoje .dia-tarefas {
-    border-left-color: var(--destaque);
+    border-left-color: var(--primaria);
   }
 
   /* agora sobra largura: o nome aparece inteiro e o objetivo entra embaixo */
   .etiqueta {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 0.1em;
+    flex-wrap: wrap;
+    gap: 0.1em 0.5em;
     min-height: 44px;
     padding: 0.5em 0.7em;
     border-radius: 0.6em;
@@ -681,6 +690,8 @@
 
   .etiqueta-objetivo {
     display: block;
+    flex-basis: 100%;
+    padding-left: calc(6px + 0.5em);
     font-size: 0.78rem;
     font-weight: 600;
     opacity: 0.9;
@@ -743,7 +754,7 @@
   }
 
   .dia-hoje .marcar-dia {
-    border-color: var(--destaque);
+    border-color: var(--primaria);
     color: var(--texto-suave);
   }
 }

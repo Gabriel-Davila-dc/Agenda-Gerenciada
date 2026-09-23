@@ -1,9 +1,11 @@
+/* três colunas: marca | abas no centro | ações. As laterais têm o mesmo peso
+   (1fr) para as abas ficarem no meio de verdade, não no meio do que sobra. */
 .barra-app {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   gap: 0.8em;
-  padding: 0.6em max(1em, env(safe-area-inset-right)) 0.6em max(1em, env(safe-area-inset-left));
+  padding: 0.7em max(1.2em, env(safe-area-inset-right)) 0.7em max(1.2em, env(safe-area-inset-left));
   background: var(--header-bg);
   color: var(--sobre-cor);
 }
@@ -13,6 +15,7 @@
   align-items: center;
   gap: 0.4em;
   min-width: 0;
+  justify-self: start;
   color: inherit;
   text-decoration: none;
   font-family: var(--fonte-titulo);
@@ -20,45 +23,81 @@
   font-weight: 800;
 }
 
-nav {
+/* ---------- abas ---------- */
+
+.abas {
   display: flex;
-  align-items: center;
-  gap: 0.3em;
+  gap: 0.2em;
+  padding: 0.3em;
+  border-radius: 100px;
+  background: color-mix(in srgb, var(--sobre-cor) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sobre-cor) 14%, transparent);
 }
 
-nav a,
-nav button {
+.abas a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 1.1em;
+  border-radius: 100px;
+  color: inherit;
+  font-family: var(--fonte-titulo);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  opacity: 0.8;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.abas a:hover {
+  opacity: 1;
+  background: color-mix(in srgb, var(--sobre-cor) 10%, transparent);
+}
+
+.abas a.ativo {
+  opacity: 1;
+  background: var(--aba-ativa-bg);
+  color: var(--aba-ativa-texto);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+/* ---------- ações ---------- */
+
+.acoes {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: 0.5em;
+}
+
+.acoes a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
   padding: 0 0.9em;
-  border: none;
   border-radius: 100px;
-  background: transparent;
   color: inherit;
-  font-family: inherit;
-  font-size: 0.95rem;
   font-weight: 600;
   text-decoration: none;
-  cursor: pointer;
-}
-
-nav a:hover,
-nav button:hover {
-  background: var(--primaria-clara);
-}
-
-nav a.ativo {
-  background: var(--bg-branco);
-  color: var(--primaria);
 }
 
 .btn-config {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
+  width: 40px;
+  height: 40px;
   padding: 0;
+  border: 1px solid color-mix(in srgb, var(--sobre-cor) 18%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--sobre-cor) 8%, transparent);
+  color: inherit;
+  cursor: pointer;
+}
+
+.btn-config:hover,
+.acoes a:hover {
+  background: color-mix(in srgb, var(--sobre-cor) 18%, transparent);
 }
 
 .btn-config mat-icon {
@@ -67,9 +106,42 @@ nav a.ativo {
   height: 1.25rem;
 }
 
-/* em 360px "Meu Dia" some, sobra só o ícone do app e o menu */
-@media (max-width: 420px) {
-  .marca-nome {
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primaria), var(--primaria-clara));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sobre-cor) 25%, transparent);
+  color: var(--sobre-cor);
+  font-family: var(--fonte-titulo);
+  font-weight: 800;
+}
+
+/* ---------- celular: as abas vão para uma linha só delas ---------- */
+
+@media (max-width: 700px) {
+  .barra-app {
+    grid-template-columns: 1fr auto;
+    row-gap: 0.6em;
+  }
+
+  .abas {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .abas a {
+    flex: 1;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 0.4em;
+    font-size: 0.88rem;
+  }
+
+  .avatar {
     display: none;
   }
 }

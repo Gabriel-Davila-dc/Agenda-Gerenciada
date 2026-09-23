@@ -1,11 +1,34 @@
-<section class="painel">
+<section class="painel painel-largo">
   <header class="topo">
     <div class="topo-texto">
-      <h1>Agenda</h1>
+      <h1 class="visually-hidden">Agenda</h1>
+      @if (visao === 'aprendizados') {
+        <p class="mes-atual">CADERNO DE APRENDIZADOS</p>
+        @if (diaCaderno; as dia) {
+          <!-- folhear o caderno: um dia por vez, do mais recente para o mais antigo -->
+          <div class="paginador">
+            <button
+              type="button"
+              aria-label="Dia anterior"
+              [disabled]="indiceCaderno >= aprendizados.length - 1"
+              (click)="folhear(1)"
+            >
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            <span>{{ dia.data ? rotuloCurtoDoDia(dia.data) : 'Sem data' }}</span>
+            <button type="button" aria-label="Dia seguinte" [disabled]="indiceCaderno === 0" (click)="folhear(-1)">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+        }
+      } @else {
+      <p class="mes-atual">{{ mesAtual }}</p>
       <p>
         @switch (visao) {
           @case ('calendario') {
-            @if (soFazendo) {
+            @if (consulta.trim()) {
+              Só o que combina com “{{ consulta.trim() }}”.
+            } @else if (soFazendo) {
               Cada tarefa aparece nos dias em que esteve em Fazendo.
             } @else {
               Toque num dia para marcar uma tarefa.
@@ -14,13 +37,25 @@
           @case ('quadro') {
             Arraste o card para mudar a tarefa de etapa.
           }
-          @default {
-            O que você aprendeu, do mais recente para o mais antigo.
-          }
         }
       </p>
+      }
     </div>
-    <div class="topo-botoes">
+
+    <div class="filtro">
+      <app-busca class="filtro-busca" [consulta]="consulta" (consultaChange)="pesquisar($event)" />
+      @if (visao === 'calendario') {
+        <button
+          type="button"
+          class="interruptor"
+          role="switch"
+          [attr.aria-checked]="soFazendo"
+          (click)="alternarSoFazendo()"
+        >
+          <span class="interruptor-trilho"><span class="interruptor-bola"></span></span>
+          Só o que estava em Fazendo
+        </button>
+      }
       <button class="btn-novo" (click)="novo()">
         <mat-icon>add</mat-icon>
         Nova tarefa
@@ -28,82 +63,23 @@
     </div>
   </header>
 
-  <div class="barra">
-    <div class="alternador" role="tablist">
-      <button
-        role="tab"
-        [class.ativo]="visao === 'calendario'"
-        [attr.aria-selected]="visao === 'calendario'"
-        (click)="trocarVisao('calendario')"
-      >
-        Calendário
-      </button>
-      <button
-        role="tab"
-        [class.ativo]="visao === 'quadro'"
-        [attr.aria-selected]="visao === 'quadro'"
-        (click)="trocarVisao('quadro')"
-      >
-        Quadro
-      </button>
-      <button
-        role="tab"
-        [class.ativo]="visao === 'aprendizados'"
-        [attr.aria-selected]="visao === 'aprendizados'"
-        (click)="trocarVisao('aprendizados')"
-      >
-        Aprendizados
-      </button>
-    </div>
-
-    <div class="filtro">
-      @if (visao === 'calendario') {
-        <!-- mesmo visual do alternador: um botão só, aceso quando ligado -->
-        <div class="alternador">
-          <button
-            [class.ativo]="soFazendo"
-            [attr.aria-pressed]="soFazendo"
-            (click)="alternarSoFazendo()"
-          >
-            Só o que estava em Fazendo
-          </button>
-        </div>
-      }
-      <app-seletor
-        class="filtro-seletor"
-        aparencia="pilula"
-        titulo="Objetivo"
-        [opcoes]="opcoesFiltro"
-        [ngModel]="filtroObjetivo"
-        (ngModelChange)="filtrar($event)"
-      />
-      @if (filtroObjetivo) {
-        <div class="progresso">
-          <span>{{ progresso.feitas }} de {{ progresso.total }} feitas</span>
-          <span
-            class="progresso-barra"
-            role="progressbar"
-            [attr.aria-valuenow]="percentualFeito"
-            aria-valuemin="0"
-            aria-valuemax="100"
-            [attr.aria-label]="'Progresso de ' + filtroObjetivo"
-          >
-            <span class="progresso-cheio" [style.width.%]="percentualFeito"></span>
-          </span>
-        </div>
-      }
-    </div>
-  </div>
-
   @if (visao === 'calendario') {
     <div class="calendario">
+      <!-- SEG TER QUA...: fora da lista, então ficam parados enquanto ela rola -->
+      <div class="cabecalho-semana" aria-hidden="true">
+        @for (nome of diasSemana; track nome) {
+          <span>{{ nome }}</span>
+        }
+      </div>
+
+      <div class="rolagem" #rolagem (scroll)="aoRolar(rolagem)">
       <button class="carregar-antes" (click)="carregarSemanaAnterior()">
-        ↑ carregar semanas anteriores
+        + carregar semanas anteriores
       </button>
 
       @for (semana of semanas; track semana.dias[0].iso) {
         @if (semana.rotuloMes) {
-          <h2 class="mes">{{ semana.rotuloMes }}</h2>
+          <h2 class="mes">{{ semana.nomeMes }} <span>{{ semana.ano }}</span></h2>
         }
 
         <!-- só aparece na agenda do celular: lá os dias vêm empilhados e
@@ -113,8 +89,17 @@
         </h3>
 
         <div class="semana" [class.semana-atual]="semana.contemHoje">
+          @if (semana.contemHoje) {
+            <span class="selo-semana">Esta semana</span>
+          }
           @for (dia of semana.dias; track dia.iso) {
-            <div class="dia" [class.dia-hoje]="dia.hoje">
+            <!-- tocar no espaço livre do dia marca tarefa nele; pelo teclado, o número faz o mesmo -->
+            <div
+              class="dia"
+              [class.dia-hoje]="dia.hoje"
+              [class.fim-de-semana]="dia.fimDeSemana"
+              (click)="clicarNoDia($event, dia.iso)"
+            >
               <span class="dia-semana">{{ dia.diaSemana }}</span>
               <button
                 class="dia-numero"
@@ -123,6 +108,9 @@
               >
                 {{ dia.numero }}
               </button>
+              @if (dia.mesCurto) {
+                <span class="mes-curto">{{ dia.mesCurto }}</span>
+              }
 
               <div class="dia-tarefas">
                 @for (tarefa of dia.tarefas; track tarefa.id) {
@@ -173,6 +161,7 @@
           }
         </div>
       }
+      </div>
     </div>
   }
 
@@ -236,9 +225,11 @@
 
   @if (visao === 'aprendizados') {
     <app-aprendizados
-      [dias]="aprendizados"
-      [filtroObjetivo]="filtroObjetivo"
+      [dia]="diaCaderno"
+      [pagina]="paginaCaderno"
+      [meses]="mesesCaderno"
       (abrir)="abrirAprendizado($event)"
+      (irParaMes)="irParaMes($event)"
     />
   }
 </section>

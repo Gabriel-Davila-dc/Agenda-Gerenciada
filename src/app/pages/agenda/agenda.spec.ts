@@ -166,7 +166,7 @@ describe('Agenda', () => {
     });
   });
 
-  describe('quadro com filtro de objetivo', () => {
+  describe('quadro', () => {
     beforeEach(() => abrir([ESTUDO, CORRIDA]));
 
     function arrastar(de: Etapa, para: Etapa): void {
@@ -184,15 +184,42 @@ describe('Agenda', () => {
       );
     }
 
-    // o quadro filtrado só tem parte das tarefas; guardar o que está na tela
-    // como se fosse tudo apagaria as outras do cache
-    it('arrastar com filtro não apaga as tarefas que o filtro esconde', () => {
-      component.filtrar('Correr 5 km');
+    it('arrastar muda só a etapa da tarefa arrastada', () => {
       arrastar('A fazer', 'Feito');
 
       expect(tarefasService.listar().length).toBe(2);
       expect(salva(CORRIDA.id).etapa).toBe('Feito');
       expect(salva(ESTUDO.id).etapa).toBe('Fazendo');
+    });
+
+    // o quadro filtrado só tem parte das tarefas; guardar o que está na tela
+    // como se fosse tudo apagaria as outras do cache
+    it('arrastar com a pesquisa ligada não apaga as tarefas que ela esconde', () => {
+      component.pesquisar('correr');
+      arrastar('A fazer', 'Feito');
+
+      expect(tarefasService.listar().length).toBe(2);
+      expect(salva(CORRIDA.id).etapa).toBe('Feito');
+      expect(salva(ESTUDO.id).etapa).toBe('Fazendo');
+    });
+
+    it('a pesquisa filtra o calendário e, limpa, mostra tudo de novo', () => {
+      const noCalendario = () =>
+        new Set(component.semanas.flatMap((s) => s.dias.flatMap((d) => d.tarefas.map((t) => t.id))));
+
+      // o calendário mostra as semanas em volta de hoje: hoje é a semana das tarefas
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date(`${QUARTA}T12:00:00`));
+
+      try {
+        component.pesquisar('rxjs');
+        expect([...noCalendario()]).toEqual([ESTUDO.id]);
+
+        component.pesquisar('');
+        expect(noCalendario()).toEqual(new Set([ESTUDO.id, CORRIDA.id]));
+      } finally {
+        jasmine.clock().uninstall();
+      }
     });
 
     it('mudar de etapa entra na fila como edição', () => {
@@ -204,21 +231,29 @@ describe('Agenda', () => {
       expect(operacoes[0].tipo).toBe('editar');
       expect((operacoes[0].dados as Tarefa).etapa).toBe('Travado');
     });
+  });
 
-    it('o progresso conta só as tarefas do objetivo filtrado', () => {
-      component.filtrar('Correr 5 km');
-      expect(component.progresso).toEqual({ feitas: 0, total: 1 });
+  describe('clique no espaço livre do dia', () => {
+    beforeEach(() => abrir([ESTUDO]));
 
-      arrastar('A fazer', 'Feito');
-      expect(component.progresso).toEqual({ feitas: 1, total: 1 });
+    // o clique chega no .dia vindo de onde o dedo tocou
+    const clique = (alvo: HTMLElement) => ({ target: alvo }) as unknown as MouseEvent;
+
+    it('abre tarefa nova naquele dia', () => {
+      component.clicarNoDia(clique(document.createElement('div')), QUARTA);
+
+      expect(component.editando!.id).toBeFalsy();
+      expect(component.editando!.dataInicio).toBe(QUARTA);
     });
 
-    it('tarefa nova com filtro ligado já nasce no objetivo da tela', () => {
-      component.filtrar('Correr 5 km');
-      component.novoNoDia(SEXTA);
+    it('não abre tarefa nova quando o toque foi numa etiqueta ou botão', () => {
+      const etiqueta = document.createElement('button');
+      const nome = document.createElement('span');
+      etiqueta.appendChild(nome);
 
-      expect(component.editando!.objetivo).toBe('Correr 5 km');
-      expect(component.editando!.dataInicio).toBe(SEXTA);
+      component.clicarNoDia(clique(nome), QUARTA);
+
+      expect(component.editando).toBeNull();
     });
   });
 
@@ -269,16 +304,6 @@ describe('Agenda', () => {
       expect(localStorage.getItem('agenda-filtro-fazendo')).toBe('1');
     });
 
-    it('junta com o filtro de objetivo', () => {
-      abrir([ESTUDO_REAL, { ...CORRIDA, historicoEtapas: [{ etapa: 'Fazendo', data: TERCA }] }]);
-
-      component.alternarSoFazendo();
-      component.filtrar('Correr 5 km');
-
-      expect(diasCom(ESTUDO.id)).toEqual([]);
-      expect(diasCom(CORRIDA.id)).toContain(TERCA);
-    });
-
     // com o filtro a tarefa aparece fora do intervalo planejado: ali não há dia para tirar
     it('não oferece tirar o dia quando o dia não é dos planejados', () => {
       abrir([{ ...ESTUDO_REAL, dataInicio: QUARTA, dataFim: SEXTA }]);
@@ -313,16 +338,55 @@ describe('Agenda', () => {
       expect(component.aprendizados).toEqual([]);
     });
 
-    it('com filtro de objetivo, o diário sai e ficam só as tarefas', () => {
-      abrir(
-        [{ ...ESTUDO, aprendizado: 'Signals' }, { ...CORRIDA, aprendizado: 'Ritmo' }],
-        [{ id: 3, data: SEXTA, texto: 'Dia produtivo' }],
+    describe('caderno', () => {
+      // três dias com anotação, em dois meses
+      beforeEach(() =>
+        abrir(
+          [],
+          [
+            { id: 1, data: '2026-08-20', texto: 'Agosto' },
+            { id: 2, data: QUARTA, texto: 'Quarta' },
+            { id: 3, data: SEXTA, texto: 'Sexta' },
+          ],
+        ),
       );
 
-      component.filtrar('Dominar Angular');
+      it('abre no dia mais recente, numerado do começo', () => {
+        expect(component.diaCaderno!.data).toBe(SEXTA);
+        // o mais antigo seria 1 e 2; o terceiro dia abre em 5 e 6
+        expect(component.paginaCaderno).toBe(5);
+      });
 
-      const itens = component.aprendizados.flatMap((dia) => dia.itens);
-      expect(itens.map((item) => item.titulo)).toEqual(['Estudar RxJS']);
+      it('folheia sem passar das pontas', () => {
+        component.folhear(-1);
+        expect(component.diaCaderno!.data).toBe(SEXTA);
+
+        component.folhear(1);
+        component.folhear(1);
+        component.folhear(1);
+        expect(component.diaCaderno!.data).toBe('2026-08-20');
+        expect(component.paginaCaderno).toBe(1);
+      });
+
+      it('um marcador por mês, e ele leva ao dia mais recente do mês', () => {
+        expect(component.mesesCaderno).toEqual([
+          { chave: '2026-09', rotulo: 'SET' },
+          { chave: '2026-08', rotulo: 'AGO' },
+        ]);
+
+        component.irParaMes('2026-08');
+        expect(component.diaCaderno!.data).toBe('2026-08-20');
+
+        component.irParaMes('2026-09');
+        expect(component.diaCaderno!.data).toBe(SEXTA);
+      });
+
+      it('sem anotação nenhuma, o caderno fica vazio', () => {
+        abrir([], []);
+
+        expect(component.diaCaderno).toBeNull();
+        expect(component.mesesCaderno).toEqual([]);
+      });
     });
 
     it('tocar num aprendizado abre o formulário certo', () => {

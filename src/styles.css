@@ -70,6 +70,11 @@ body {
      escuro e --primaria vira dourado (usado no botão cheio, não na barra). */
   --header-bg: var(--primaria);
 
+  /* aba ativa no topo (Calendário / Quadro / Aprendizados): pílula clara sobre
+     a barra colorida; Ônix e Nebulosa, que têm topo escuro, trocam abaixo */
+  --aba-ativa-bg: var(--bg-branco);
+  --aba-ativa-texto: var(--primaria);
+
   color-scheme: light;
 }
 
@@ -162,6 +167,8 @@ body {
   --sombra: 0 8px 28px rgba(0, 0, 0, 0.6);
   --erro: #ff6b70;
   --header-bg: #0a0a0b;
+  --aba-ativa-bg: var(--primaria);
+  --aba-ativa-texto: #0d0d0f;
   color-scheme: dark;
 }
 
@@ -181,9 +188,9 @@ body {
   --texto-suave: #b8a8c2;
   --fundo-creme: #241a2c;
   --fundo-pagina:
-    radial-gradient(60% 50% at 78% 92%, rgba(199, 74, 190, 0.35), transparent 70%),
-    radial-gradient(45% 40% at 88% 62%, rgba(155, 45, 160, 0.3), transparent 70%),
-    linear-gradient(135deg, #08070a 0%, #1c1024 35%, #3a1a4a 65%, #5c2560 85%, #7a2f74 100%);
+    radial-gradient(60% 50% at 78% 92%, rgba(199, 74, 190, 0.28), transparent 70%),
+    radial-gradient(45% 40% at 88% 62%, rgba(155, 45, 160, 0.24), transparent 70%),
+    linear-gradient(135deg, #08070a 0%, #160d1d 35%, #2e153b 65%, #4a1e4d 85%, #62265d 100%);
   --diario: #5ecfc9;
   --diario-suave: rgba(94, 207, 201, 0.16);
   --etapa-a-fazer: #9a90a3;
@@ -197,6 +204,8 @@ body {
   --sombra: 0 8px 28px rgba(0, 0, 0, 0.55);
   --erro: #ff6b70;
   --header-bg: transparent;
+  --aba-ativa-bg: linear-gradient(90deg, var(--primaria), var(--primaria-clara));
+  --aba-ativa-texto: var(--sobre-cor);
   color-scheme: dark;
 }
 
@@ -224,12 +233,30 @@ button.mat-mdc-raised-button.btn-cadastrar {
    ========================================================================== */
 
 .painel {
-  background: var(--bg-branco);
+  /* translúcido: no tema Nebulosa o degradê do fundo aparece por trás */
+  background: color-mix(in srgb, var(--bg-branco) 72%, transparent);
+  border: 1px solid var(--borda-cinza);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   width: min(100% - 2em, 82em);
   margin: 2em auto;
   padding: 2em 1.5em 2.5em;
   border-radius: 1.6em;
   box-shadow: var(--sombra);
+}
+
+/* painel sem moldura, na largura toda da tela: a agenda, que precisa de
+   espaço para sete colunas de dias */
+.painel.painel-largo {
+  width: 100%;
+  margin: 0;
+  padding: 1.2em clamp(0.8em, 2.5vw, 2.5em) 2em;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .topo {
@@ -259,6 +286,117 @@ button.mat-mdc-raised-button.btn-cadastrar {
   font-size: 0.95rem;
 }
 
+/* texto só para leitor de tela (ex.: o h1 da agenda, onde na tela quem fala é o mês) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* "SETEMBRO DE 2026" em cima do texto do topo */
+.mes-atual {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--primaria);
+}
+
+/* ‹ Terça, 22 de setembro ›: folhear um item por vez (o caderno da agenda) */
+.paginador {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  margin-top: 0.2em;
+  font-family: var(--fonte-titulo);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--texto);
+}
+
+.paginador button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  border: 1px solid var(--borda-cinza);
+  border-radius: 50%;
+  background: var(--bg-botao-neutro);
+  color: var(--texto);
+  cursor: pointer;
+}
+
+.paginador button:hover:not(:disabled) {
+  border-color: var(--primaria);
+  color: var(--primaria);
+}
+
+.paginador button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.paginador span {
+  min-width: 11em;
+  text-align: center;
+}
+
+/* interruptor liga/desliga (role="switch"): um botão com trilho e bolinha */
+.interruptor {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: 44px;
+  padding: 0 1em 0 0.6em;
+  border: 1px solid var(--borda-cinza);
+  border-radius: 100px;
+  background: var(--bg-botao-neutro);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.interruptor-trilho {
+  position: relative;
+  flex: none;
+  width: 2.2em;
+  height: 1.25em;
+  border-radius: 100px;
+  background: var(--borda-cinza);
+  transition: background 0.2s ease;
+}
+
+.interruptor-bola {
+  position: absolute;
+  top: 0.15em;
+  left: 0.15em;
+  width: 0.95em;
+  height: 0.95em;
+  border-radius: 50%;
+  background: var(--sobre-cor);
+  transition: transform 0.2s ease;
+}
+
+.interruptor[aria-checked='true'] {
+  color: var(--texto);
+}
+
+.interruptor[aria-checked='true'] .interruptor-trilho {
+  background: var(--primaria);
+}
+
+.interruptor[aria-checked='true'] .interruptor-bola {
+  transform: translateX(0.95em);
+}
+
 .voltar {
   padding: 0.4em 1em;
   border-radius: 100px;
@@ -280,13 +418,13 @@ button.mat-mdc-raised-button.btn-cadastrar {
   padding: 0.7em 1.3em;
   border: none;
   border-radius: 100px;
-  background: var(--primaria);
+  background: linear-gradient(90deg, var(--primaria), var(--primaria-clara));
   color: var(--sobre-cor);
   font-family: var(--fonte-titulo);
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 8px 18px rgba(47, 75, 124, 0.3);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--primaria) 35%, transparent);
   transition:
     transform 0.15s ease,
     background 0.2s ease;
@@ -383,6 +521,59 @@ button.mat-mdc-raised-button.btn-cadastrar {
 .dica-cadastro a {
   color: var(--primaria);
   font-weight: 600;
+}
+
+/* o campo "O que aprendi" da tarefa e o formulário do diário (agenda) */
+
+.formulario .campo-aprendizado {
+  color: var(--diario);
+}
+
+.campo-aprendizado span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
+.campo-aprendizado mat-icon {
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.formulario .campo-aprendizado textarea {
+  border-color: var(--diario);
+  background: var(--diario-suave);
+}
+
+.sem-objetivo {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  min-height: 44px;
+  padding: 0.6em 0.7em;
+  border: 1px dashed var(--primaria-clara);
+  border-radius: 0.6em;
+  color: var(--primaria);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.formulario-diario h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  color: var(--diario);
+}
+
+.diario-dia {
+  margin: -0.5em 0 0;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.diario-dia::first-letter {
+  text-transform: uppercase;
 }
 
 /* Tirar um dia é ação de risco menor que apagar, mas ainda é perda de dado:

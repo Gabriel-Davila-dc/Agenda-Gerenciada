@@ -1,0 +1,17 @@
+<label class="campo" [class.ativo]="consulta.trim()">
+  <mat-icon>search</mat-icon>
+  <input
+    type="search"
+    placeholder="Filtrar o que aparece"
+    aria-label="Filtrar tarefas e diário"
+    autocomplete="off"
+    [ngModel]="consulta"
+    (ngModelChange)="mudar($event)"
+    (keydown.escape)="mudar('')"
+  />
+  @if (consulta) {
+    <button type="button" class="limpar" aria-label="Limpar filtro" (click)="mudar('')">
+      <mat-icon>close</mat-icon>
+    </button>
+  }
+</label>

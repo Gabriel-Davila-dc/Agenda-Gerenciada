@@ -1,28 +1,59 @@
-<div class="container">
-  <form (ngSubmit)="logar()" class="card">
-    <h1>Entrar na Conta</h1>
+<div class="tela">
+  <!-- calendário de enfeite atrás do cartão: só visual, fora da leitura de tela -->
+  <div class="fundo" aria-hidden="true">
+    <div class="grade">
+      @for (dia of dias; track $index) {
+        <div class="dia" [class.vazio]="!dia.numero" [class.hoje]="dia.hoje">
+          @if (dia.numero) {
+            <span class="numero">{{ dia.numero }}</span>
+            @for (tarefa of dia.tarefas; track tarefa) {
+              <span class="chip">{{ tarefa }}</span>
+            }
+          }
+        </div>
+      }
+    </div>
+  </div>
 
-    <p *ngIf="error">{{ error }}</p>
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Email</mat-label>
-      <input matInput placeholder="Digite seu E-mail" [(ngModel)]="email" name="email" required />
-    </mat-form-field>
+  <form (ngSubmit)="logar()" class="cartao" novalidate>
+    <div class="marca">
+      <mat-icon>event_note</mat-icon>
+      <span>Meu Dia</span>
+    </div>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Senha</mat-label>
+    <p class="mes">{{ mesAtual }}</p>
+    <h1>Entrar na conta</h1>
+
+    <label>
+      Email
       <input
-        matInput
+        type="email"
+        placeholder="voce@email.com"
+        autocomplete="email"
+        [(ngModel)]="email"
+        name="email"
+        required
+      />
+    </label>
+
+    <label>
+      Senha
+      <input
         type="password"
-        placeholder="Digite sua senha"
+        placeholder="Sua senha"
+        autocomplete="current-password"
         [(ngModel)]="password"
         name="password"
         required
       />
-    </mat-form-field>
+    </label>
 
-    <button mat-raised-button type="submit" class="btn-entrar">Entrar</button>
-    <button mat-raised-button class="btn-entrar btn-cadastrar" routerLink="/register">
-      Cadastrar
-    </button>
+    @if (error) {
+      <p class="erro" role="alert">{{ error }}</p>
+    }
+
+    <button type="submit" class="entrar">Entrar</button>
+
+    <p class="rodape">Novo por aqui? <a routerLink="/register">Criar conta</a></p>
   </form>
 </div>

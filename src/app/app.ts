@@ -1,5 +1,7 @@
 import { Component, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter, map } from 'rxjs';
 import { Header } from './components/header/header';
 import { PainelConfiguracoes } from './components/painel-configuracoes/painel-configuracoes';
 import { AlertService } from './services/alert-service';
@@ -19,6 +21,16 @@ import { ThemeService } from './services/theme-service';
 export class App {
   private userService = inject(UserService);
   private alert = inject(AlertService);
+  private router = inject(Router);
+
+  /** O login desenha a própria marca no cartão, por cima do calendário de fundo. */
+  semTopo = toSignal(
+    this.router.events.pipe(
+      filter((e) => e instanceof NavigationEnd),
+      map(() => this.router.url.startsWith('/login')),
+    ),
+    { initialValue: false },
+  );
 
   constructor() {
     // cada service registra seu handler na fila no construtor. Criados aqui,
