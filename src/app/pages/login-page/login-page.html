@@ -38,15 +38,51 @@
 
     <label>
       Senha
-      <input
-        type="password"
-        [placeholder]="criando ? 'Pelo menos 6 caracteres' : 'Sua senha'"
-        [attr.autocomplete]="criando ? 'new-password' : 'current-password'"
-        [(ngModel)]="password"
-        name="password"
-        required
-      />
+      <span class="campo-senha">
+        <input
+          id="senha"
+          [type]="senhaVisivel ? 'text' : 'password'"
+          [placeholder]="criando ? 'Pelo menos 6 caracteres' : 'Sua senha'"
+          [attr.autocomplete]="criando ? 'new-password' : 'current-password'"
+          [(ngModel)]="password"
+          name="password"
+          required
+        />
+        <!-- um botão só mostra as duas senhas: quem quer conferir quer ver as duas -->
+        <button
+          type="button"
+          class="ver-senha"
+          [attr.aria-label]="senhaVisivel ? 'Esconder senha' : 'Mostrar senha'"
+          [attr.aria-pressed]="senhaVisivel"
+          (click)="senhaVisivel = !senhaVisivel"
+        >
+          <mat-icon>{{ senhaVisivel ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </span>
     </label>
+
+    @if (criando) {
+      <label>
+        Repita a senha
+        <input
+          id="confirmacao"
+          [type]="senhaVisivel ? 'text' : 'password'"
+          placeholder="A mesma senha de novo"
+          autocomplete="new-password"
+          [(ngModel)]="confirmacao"
+          name="confirmacao"
+          aria-describedby="dica-confirmacao"
+          required
+        />
+      </label>
+      <!-- avisa enquanto digita, sem esperar o clique em Criar conta -->
+      <p id="dica-confirmacao" class="dica-senha" [class.igual]="senhasIguais" aria-live="polite">
+        @if (confirmacao) {
+          <mat-icon>{{ senhasIguais ? 'check_circle' : 'error' }}</mat-icon>
+          {{ senhasIguais ? 'As senhas conferem.' : 'As senhas ainda não estão iguais.' }}
+        }
+      </p>
+    }
 
     @if (error) {
       <p class="erro" role="alert">{{ error }}</p>

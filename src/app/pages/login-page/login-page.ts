@@ -66,7 +66,14 @@ export class LoginPage {
 
   email = '';
   password = '';
+  // só ao criar conta: a senha digitada de novo, para pegar erro de digitação
+  confirmacao = '';
+  senhaVisivel = false;
   error = '';
+
+  get senhasIguais(): boolean {
+    return this.password === this.confirmacao;
+  }
 
   /**
    * O que está acontecendo depois do clique, para o botão dizer. Criar conta são
@@ -186,6 +193,14 @@ export class LoginPage {
 
     if (senha.length < 6) {
       return 'A senha precisa ter pelo menos 6 caracteres.';
+    }
+
+    if (this.criando && !this.confirmacao) {
+      return 'Repita a senha no segundo campo.';
+    }
+
+    if (this.criando && !this.senhasIguais) {
+      return 'As duas senhas não estão iguais. Confira e tente de novo.';
     }
 
     return null; // tudo ok

@@ -33,6 +33,7 @@ describe('LoginPage', () => {
     const pagina = TestBed.createComponent(LoginPage).componentInstance;
     pagina.email = 'eu@exemplo.com';
     pagina.password = 'segredo123';
+    pagina.confirmacao = 'segredo123';
     return pagina;
   }
 
@@ -98,6 +99,52 @@ describe('LoginPage', () => {
     pagina.enviar();
 
     expect(usuarios.postUserRegister).toHaveBeenCalledTimes(1);
+  });
+
+  it('senhas diferentes não criam a conta', () => {
+    const pagina = abrir('criar');
+    pagina.confirmacao = 'segredo124';
+
+    pagina.enviar();
+
+    expect(pagina.senhasIguais).toBeFalse();
+    expect(pagina.error).toContain('não estão iguais');
+    expect(usuarios.postUserRegister).not.toHaveBeenCalled();
+  });
+
+  it('confirmação vazia pede para repetir a senha', () => {
+    const pagina = abrir('criar');
+    pagina.confirmacao = '';
+
+    pagina.enviar();
+
+    expect(pagina.error).toBe('Repita a senha no segundo campo.');
+  });
+
+  it('entrar não pede confirmação', () => {
+    const pagina = abrir();
+    pagina.confirmacao = '';
+    usuarios.getUserLogin.and.returnValue(new Subject<never>());
+
+    pagina.enviar();
+
+    expect(usuarios.getUserLogin).toHaveBeenCalled();
+  });
+
+  it('o olho mostra e esconde as duas senhas', () => {
+    TestBed.resetTestingModule();
+    abrir('criar');
+    const fixture = TestBed.createComponent(LoginPage);
+    fixture.detectChanges();
+    const tela = fixture.nativeElement as HTMLElement;
+    const tipos = () => [...tela.querySelectorAll<HTMLInputElement>('#senha, #confirmacao')].map((i) => i.type);
+
+    expect(tipos()).toEqual(['password', 'password']);
+
+    tela.querySelector<HTMLButtonElement>('.ver-senha')!.click();
+    fixture.detectChanges();
+
+    expect(tipos()).toEqual(['text', 'text']);
   });
 
   it('senha curta nem chega a ir para a API', () => {

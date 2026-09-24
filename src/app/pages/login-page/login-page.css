@@ -194,6 +194,72 @@ input:focus {
   outline-offset: 1px;
 }
 
+/* o olho fica dentro do campo, à direita; o texto não passa por baixo dele */
+.campo-senha {
+  position: relative;
+  display: flex;
+}
+
+.campo-senha input {
+  flex: 1;
+  min-width: 0;
+  padding-right: 3em;
+}
+
+.ver-senha {
+  position: absolute;
+  top: 50%;
+  right: 0.35em;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4em;
+  height: 2.4em;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.ver-senha:hover,
+.ver-senha[aria-pressed='true'] {
+  color: var(--primaria);
+}
+
+.ver-senha:focus-visible {
+  outline: 2px solid var(--primaria-clara);
+}
+
+.ver-senha mat-icon {
+  font-size: 1.25em;
+  width: 1.25em;
+  height: 1.25em;
+}
+
+.dica-senha {
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+  min-height: 1.2em;
+  margin: -0.5em 0 0;
+  font-size: 0.85em;
+  color: var(--erro);
+}
+
+.dica-senha.igual {
+  color: var(--etapa-feito);
+}
+
+.dica-senha mat-icon {
+  font-size: 1.15em;
+  width: 1.15em;
+  height: 1.15em;
+}
+
 .erro {
   margin: 0;
   color: var(--erro);
