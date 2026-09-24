@@ -17,7 +17,28 @@ body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
   min-height: 100vh;
+  /* cor lisa por baixo: é o que aparece quando o celular estica a página além
+     da borda. O fundo de verdade (que pode ser degradê) vem no ::before */
+  background: var(--fundo-base);
+}
+
+/**
+ * O fundo da página numa camada parada, com a altura da tela sem a barra do
+ * navegador (lvh). Pintado no body, ele acompanhava a altura visível: no
+ * celular a barra de endereço some ao rolar, a tela cresce, e o degradê
+ * esticava e parecia subir alguns pixels.
+ */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100lvh;
+  z-index: -1;
   background: var(--fundo-pagina);
+  pointer-events: none;
 }
 
 /**
@@ -38,6 +59,7 @@ body {
   --texto: #1f2733;
   --texto-suave: #4b5563;
   --fundo-creme: #f7f5ef;
+  --fundo-base: #e8edf5;
   --fundo-pagina: #e8edf5;
   --fonte-titulo: 'Nunito', 'Roboto', sans-serif;
 
@@ -91,6 +113,7 @@ body {
   --texto: #e9edf5;
   --texto-suave: #aab4c8;
   --fundo-creme: #262e42;
+  --fundo-base: #10141d;
   --fundo-pagina: #10141d;
   --diario: #a48ee8;
   --diario-suave: #2c2447;
@@ -118,6 +141,7 @@ body {
     --texto: #e9edf5;
     --texto-suave: #aab4c8;
     --fundo-creme: #262e42;
+    --fundo-base: #10141d;
     --fundo-pagina: #10141d;
     --diario: #a48ee8;
     --diario-suave: #2c2447;
@@ -153,6 +177,7 @@ body {
   --texto: #f5f5f2;
   --texto-suave: #9c9994;
   --fundo-creme: #1c1c1e;
+  --fundo-base: #0d0d0f;
   --fundo-pagina: #0d0d0f;
   --diario: #a48ee8;
   --diario-suave: #2c2447;
@@ -187,6 +212,7 @@ body {
   --texto: #f5f0f7;
   --texto-suave: #b8a8c2;
   --fundo-creme: #241a2c;
+  --fundo-base: #1c1024;
   --fundo-pagina:
     radial-gradient(60% 50% at 78% 92%, rgba(199, 74, 190, 0.28), transparent 70%),
     radial-gradient(45% 40% at 88% 62%, rgba(155, 45, 160, 0.24), transparent 70%),

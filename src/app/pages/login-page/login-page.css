@@ -13,9 +13,17 @@
 
 /* ---------- calendário de enfeite ---------- */
 
+/* parado na tela, com a altura da tela sem a barra do navegador: preso à
+   .tela (que mede 100dvh), ele encolhia e crescia junto com a barra do
+   celular, e o calendário de enfeite pulava ao rolar */
 .fundo {
-  position: absolute;
-  inset: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100lvh;
+  overflow: hidden;
   z-index: -1;
   /* brilho da cor do tema no canto, por cima do fundo da página */
   background: radial-gradient(
